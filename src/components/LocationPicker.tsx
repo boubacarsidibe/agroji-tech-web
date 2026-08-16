@@ -23,8 +23,11 @@ export default function LocationPicker({
   const mapRef = useRef<import("leaflet").Map | null>(null);
   const markerRef = useRef<import("leaflet").Marker | null>(null);
   const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
   const [locating, setLocating] = useState(false);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
