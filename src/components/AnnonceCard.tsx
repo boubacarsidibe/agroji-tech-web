@@ -2,7 +2,7 @@
 
 import { useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import { createCommande, ApiError, type Annonce } from "@/lib/api";
+import { createCommande, createSignalement, ApiError, type Annonce } from "@/lib/api";
 import { getSession, subscribeToAuthChanges } from "@/lib/auth";
 
 const categorieLabels: Record<Annonce["categorie"], string> = {
@@ -22,6 +22,12 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
+
+  const [reporting, setReporting] = useState(false);
+  const [raison, setRaison] = useState("");
+  const [reportSent, setReportSent] = useState(false);
+  const [reportLoading, setReportLoading] = useState(false);
+  const [reportError, setReportError] = useState<string | null>(null);
 
   function handleOrderClick() {
     if (!session) {
@@ -45,6 +51,31 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
       setError(err instanceof ApiError ? err.message : "Impossible d'envoyer la demande.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  function handleReportClick() {
+    if (!session) {
+      router.push("/login");
+      return;
+    }
+    setReportError(null);
+    setReporting(true);
+  }
+
+  async function handleReportConfirm() {
+    if (!session || !raison.trim()) return;
+    setReportLoading(true);
+    setReportError(null);
+
+    try {
+      await createSignalement(session.token, { annonceId: annonce.id, raison: raison.trim() });
+      setReportSent(true);
+      setReporting(false);
+    } catch (err) {
+      setReportError(err instanceof ApiError ? err.message : "Impossible d'envoyer le signalement.");
+    } finally {
+      setReportLoading(false);
     }
   }
 
@@ -92,13 +123,64 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
           </span>
         </div>
 
-        <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
-          {annonce.producteur.nom}
-          {annonce.producteur.verifie ? " ✓" : ""}
-          {annonce.producteur.noteMoyenne != null
-            ? ` · ${annonce.producteur.noteMoyenne.toFixed(1)}★`
-            : ""}
-        </p>
+        <div className="flex items-center justify-between gap-2">
+          <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
+            {annonce.producteur.nom}
+            {annonce.producteur.verifie ? " ✓" : ""}
+            {annonce.producteur.noteMoyenne != null
+              ? ` · ${annonce.producteur.noteMoyenne.toFixed(1)}★`
+              : ""}
+          </p>
+          {!reportSent && (
+            <button
+              type="button"
+              onClick={handleReportClick}
+              className="whitespace-nowrap font-[family-name:var(--font-work-sans)] text-xs text-[#7c8a80] hover:text-[#7a1f14] hover:underline"
+            >
+              Signaler
+            </button>
+          )}
+        </div>
+
+        {reporting && (
+          <div className="flex flex-col gap-2 rounded-lg border border-[#bfc9c1] p-2">
+            <textarea
+              value={raison}
+              onChange={(e) => setRaison(e.target.value)}
+              placeholder="Motif du signalement..."
+              rows={2}
+              className="rounded-lg border border-[#bfc9c1] px-2 py-1.5 font-[family-name:var(--font-work-sans)] text-xs text-[#171c19] outline-none focus:border-[#0f5238]"
+            />
+            {reportError && (
+              <p className="font-[family-name:var(--font-work-sans)] text-xs text-[#7a1f14]">
+                {reportError}
+              </p>
+            )}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                disabled={reportLoading || !raison.trim()}
+                onClick={handleReportConfirm}
+                className="flex-1 rounded-lg bg-[#0f5238] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-xs font-medium text-white hover:bg-[#0c4029] disabled:opacity-60"
+              >
+                {reportLoading ? "Envoi..." : "Envoyer"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setReporting(false)}
+                className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-xs text-[#404943] hover:bg-black/5"
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+        )}
+
+        {reportSent && (
+          <p className="font-[family-name:var(--font-work-sans)] text-xs text-[#7c8a80]">
+            Signalement envoye, merci.
+          </p>
+        )}
 
         {error && (
           <p className="rounded-lg bg-[#fdecea] px-3 py-2 font-[family-name:var(--font-work-sans)] text-xs text-[#7a1f14]">

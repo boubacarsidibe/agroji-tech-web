@@ -134,6 +134,7 @@ export type Commande = {
   statut: StatutCommande;
   createdAt: string;
   annonce: Pick<Annonce, "id" | "espece" | "variete" | "prixUnitaire" | "photos">;
+  evaluation?: { id: string; note: number; commentaire?: string | null } | null;
 };
 
 export async function createCommande(
@@ -190,6 +191,47 @@ export async function updateCommandeStatut(
   return body as Commande;
 }
 
+export type Evaluation = {
+  id: string;
+  commandeId: string;
+  note: number;
+  commentaire?: string | null;
+};
+
+export async function createEvaluation(
+  token: string,
+  data: { commandeId: string; note: number; commentaire?: string }
+): Promise<Evaluation> {
+  const res = await fetch(`${API_URL}/api/evaluations`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible d'envoyer l'evaluation", res.status);
+  }
+
+  return body as Evaluation;
+}
+
+export async function createSignalement(
+  token: string,
+  data: { annonceId?: string; raison: string }
+): Promise<void> {
+  const res = await fetch(`${API_URL}/api/signalements`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible d'envoyer le signalement", res.status);
+  }
+}
+
 export type Producteur = {
   id: string;
   nom: string;
@@ -209,6 +251,10 @@ export type ListProducteursParams = {
   page?: number;
 };
 
+export type ListUtilisateursParams = ListProducteursParams & {
+  role?: "PRODUCTEUR" | "ACHETEUR";
+};
+
 export type ListProducteursResult = {
   total: number;
   page: number;
@@ -216,10 +262,10 @@ export type ListProducteursResult = {
   resultats: Producteur[];
 };
 
-export async function listProducteurs(
-  params: ListProducteursParams
+export async function listUtilisateurs(
+  params: ListUtilisateursParams
 ): Promise<ListProducteursResult> {
-  const query = new URLSearchParams({ role: "PRODUCTEUR" });
+  const query = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
     if (value !== undefined && value !== "") query.set(key, String(value));
   }
@@ -229,10 +275,246 @@ export async function listProducteurs(
   });
 
   if (!res.ok) {
-    throw new Error(`Echec du chargement des producteurs (${res.status})`);
+    throw new Error(`Echec du chargement des utilisateurs (${res.status})`);
   }
 
   return res.json();
+}
+
+export async function listProducteurs(
+  params: ListProducteursParams
+): Promise<ListProducteursResult> {
+  return listUtilisateurs({ ...params, role: "PRODUCTEUR" });
+}
+
+export type StatutAnnonce = "DISPONIBLE" | "RUPTURE" | "ARCHIVEE";
+
+export type AnnonceInput = {
+  espece: string;
+  variete?: string;
+  categorie: Categorie;
+  quantite: number;
+  prixUnitaire: number;
+  ville?: string;
+  region?: string;
+  photos?: string[];
+};
+
+export type MonAnnonce = Omit<Annonce, "producteur"> & { statut: StatutAnnonce };
+
+export async function listMesAnnonces(token: string): Promise<MonAnnonce[]> {
+  const res = await fetch(`${API_URL}/api/annonces/mine`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible de charger vos annonces", res.status);
+  }
+
+  return body as MonAnnonce[];
+}
+
+export async function createAnnonce(token: string, data: AnnonceInput): Promise<MonAnnonce> {
+  const res = await fetch(`${API_URL}/api/annonces`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible de creer l'annonce", res.status);
+  }
+
+  return body as MonAnnonce;
+}
+
+export async function updateAnnonce(
+  token: string,
+  id: string,
+  data: Partial<AnnonceInput> & { statut?: StatutAnnonce }
+): Promise<MonAnnonce> {
+  const res = await fetch(`${API_URL}/api/annonces/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Mise a jour impossible", res.status);
+  }
+
+  return body as MonAnnonce;
+}
+
+export async function deleteAnnonce(token: string, id: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/annonces/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Suppression impossible", res.status);
+  }
+}
+
+export type Notification = {
+  id: string;
+  type: string;
+  contenu: string;
+  lu: boolean;
+  createdAt: string;
+};
+
+export async function listNotifications(token: string): Promise<Notification[]> {
+  const res = await fetch(`${API_URL}/api/notifications`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible de charger les notifications", res.status);
+  }
+
+  return body as Notification[];
+}
+
+export async function markNotificationAsRead(token: string, id: string): Promise<Notification> {
+  const res = await fetch(`${API_URL}/api/notifications/${id}/lue`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Mise a jour impossible", res.status);
+  }
+
+  return body as Notification;
+}
+
+export async function markAllNotificationsAsRead(token: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/notifications/lues/toutes`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Mise a jour impossible", res.status);
+  }
+}
+
+export type AdminDashboard = {
+  utilisateurs: number;
+  annoncesActives: number;
+  transactions: number;
+  signalementsOuverts: number;
+};
+
+export async function getAdminDashboard(token: string): Promise<AdminDashboard> {
+  const res = await fetch(`${API_URL}/api/admin/dashboard`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible de charger le tableau de bord", res.status);
+  }
+
+  return body as AdminDashboard;
+}
+
+export type StatutSignalement = "OUVERT" | "TRAITE" | "REJETE";
+
+export type Signalement = {
+  id: string;
+  annonceId?: string | null;
+  auteurId: string;
+  raison: string;
+  statut: StatutSignalement;
+  createdAt: string;
+  annonce?: Pick<Annonce, "id" | "espece" | "variete"> | null;
+  auteur: { id: string; nom: string };
+};
+
+export async function listSignalements(
+  token: string,
+  statut?: StatutSignalement
+): Promise<Signalement[]> {
+  const query = statut ? `?statut=${statut}` : "";
+  const res = await fetch(`${API_URL}/api/admin/signalements${query}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible de charger les signalements", res.status);
+  }
+
+  return body as Signalement[];
+}
+
+export async function traiterSignalement(
+  token: string,
+  id: string,
+  statut: "TRAITE" | "REJETE"
+): Promise<Signalement> {
+  const res = await fetch(`${API_URL}/api/admin/signalements/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ statut }),
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Mise a jour impossible", res.status);
+  }
+
+  return body as Signalement;
+}
+
+export async function archiverAnnonceAdmin(token: string, id: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/admin/annonces/${id}/archiver`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Archivage impossible", res.status);
+  }
+}
+
+export async function suspendreUtilisateur(token: string, id: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/admin/utilisateurs/${id}/suspendre`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Suspension impossible", res.status);
+  }
+}
+
+export async function verifierUtilisateur(token: string, id: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/admin/utilisateurs/${id}/verifier`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Verification impossible", res.status);
+  }
 }
 
 export async function searchAnnonces(

@@ -4,6 +4,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
+  createEvaluation,
   listCommandes,
   updateCommandeStatut,
   ApiError,
@@ -40,6 +41,8 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionId, setActionId] = useState<string | null>(null);
+  const [evaluatingId, setEvaluatingId] = useState<string | null>(null);
+  const [note, setNote] = useState(5);
 
   useEffect(() => {
     if (session === null) return;
@@ -69,6 +72,23 @@ export default function OrdersPage() {
       setCommandes((prev) => prev.map((c) => (c.id === id ? updated : c)));
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Mise a jour impossible.");
+    } finally {
+      setActionId(null);
+    }
+  }
+
+  async function handleEvaluer(commandeId: string) {
+    if (!session) return;
+    setActionId(commandeId);
+    try {
+      const evaluation = await createEvaluation(session.token, { commandeId, note });
+      setCommandes((prev) =>
+        prev.map((c) => (c.id === commandeId ? { ...c, evaluation } : c))
+      );
+      setEvaluatingId(null);
+      setNote(5);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Impossible d'envoyer l'evaluation.");
     } finally {
       setActionId(null);
     }
@@ -188,6 +208,44 @@ export default function OrdersPage() {
                   >
                     Finaliser
                   </button>
+                )}
+
+                {role === "acheteur" && commande.statut === "FINALISEE" && (
+                  commande.evaluation ? (
+                    <span className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+                      Note envoyee: {commande.evaluation.note}★
+                    </span>
+                  ) : evaluatingId === commande.id ? (
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={note}
+                        onChange={(e) => setNote(Number(e.target.value))}
+                        className="rounded-lg border border-[#bfc9c1] px-2 py-1.5 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+                      >
+                        {[5, 4, 3, 2, 1].map((n) => (
+                          <option key={n} value={n}>
+                            {n}★
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        disabled={actionId === commande.id}
+                        onClick={() => handleEvaluer(commande.id)}
+                        className="rounded-lg bg-[#0f5238] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#0c4029] disabled:opacity-60"
+                      >
+                        Envoyer
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setEvaluatingId(commande.id)}
+                      className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-black/5"
+                    >
+                      Evaluer
+                    </button>
+                  )
                 )}
               </div>
             </div>

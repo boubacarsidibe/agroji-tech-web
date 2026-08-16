@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { clearSession, getSession, subscribeToAuthChanges } from "@/lib/auth";
+import NotificationBell from "@/components/NotificationBell";
 
 const navLinks = [
   { label: "Catalog", href: "/catalog" },
@@ -20,6 +21,9 @@ export default function Header() {
     getSession,
     () => null
   );
+
+  const isProducteur = session?.utilisateur.roles.includes("PRODUCTEUR") ?? false;
+  const isAdmin = session?.utilisateur.roles.includes("ADMIN") ?? false;
 
   function handleLogout() {
     clearSession();
@@ -58,16 +62,36 @@ export default function Header() {
             >
               <Image src="/icons/cart.svg" alt="" width={20} height={20} />
             </button>
-            <button
-              type="button"
-              aria-label="Notifications"
-              className="flex size-10 items-center justify-center rounded-full hover:bg-black/5"
-            >
-              <Image src="/icons/bell.svg" alt="" width={16} height={20} />
-            </button>
+            {session ? (
+              <NotificationBell session={session} />
+            ) : (
+              <button
+                type="button"
+                aria-label="Notifications"
+                className="flex size-10 items-center justify-center rounded-full hover:bg-black/5"
+              >
+                <Image src="/icons/bell.svg" alt="" width={16} height={20} />
+              </button>
+            )}
           </div>
           {session ? (
             <div className="flex items-center gap-3">
+              {isProducteur && (
+                <Link
+                  href="/dashboard"
+                  className="whitespace-nowrap font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:text-[#0f5238]"
+                >
+                  Mes annonces
+                </Link>
+              )}
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  className="whitespace-nowrap font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:text-[#0f5238]"
+                >
+                  Admin
+                </Link>
+              )}
               <span className="whitespace-nowrap font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
                 {session.utilisateur.nom}
               </span>

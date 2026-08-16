@@ -18,15 +18,25 @@ export function clearSession() {
   window.dispatchEvent(new Event(AUTH_EVENT));
 }
 
+let cachedRaw: string | null = null;
+let cachedSession: Session | null = null;
+
 export function getSession(): Session | null {
   if (typeof window === "undefined") return null;
   const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as Session;
-  } catch {
-    return null;
+  if (raw === cachedRaw) return cachedSession;
+
+  cachedRaw = raw;
+  if (!raw) {
+    cachedSession = null;
+    return cachedSession;
   }
+  try {
+    cachedSession = JSON.parse(raw) as Session;
+  } catch {
+    cachedSession = null;
+  }
+  return cachedSession;
 }
 
 export function subscribeToAuthChanges(callback: () => void) {
