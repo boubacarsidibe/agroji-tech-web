@@ -51,7 +51,9 @@ function CatalogView() {
 
   const [annonces, setAnnonces] = useState<Annonce[]>([]);
   const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [recherches, setRecherches] = useState<RechercheSauvegardee[]>([]);
@@ -152,29 +154,42 @@ function CatalogView() {
   }
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setLoading(true);
-      setError(null);
-
-      searchAnnonces({
-        q: q || undefined,
-        categorie: categorie || undefined,
-        region: region || undefined,
-        tri,
-        latitude: coords?.latitude,
-        longitude: coords?.longitude,
-        rayonKm: coords ? rayonKm : undefined,
-      })
-        .then((result) => {
-          setAnnonces(result.resultats);
-          setTotal(result.total);
-        })
-        .catch(() => setError("Impossible de charger le catalogue pour le moment."))
-        .finally(() => setLoading(false));
-    }, 300);
-
+    const timeout = setTimeout(() => setPage(1), 0);
     return () => clearTimeout(timeout);
   }, [q, categorie, region, tri, coords, rayonKm]);
+
+  useEffect(() => {
+    const timeout = setTimeout(
+      () => {
+        if (page === 1) setLoading(true);
+        else setLoadingMore(true);
+        setError(null);
+
+        searchAnnonces({
+          q: q || undefined,
+          categorie: categorie || undefined,
+          region: region || undefined,
+          tri,
+          latitude: coords?.latitude,
+          longitude: coords?.longitude,
+          rayonKm: coords ? rayonKm : undefined,
+          page,
+        })
+          .then((result) => {
+            setAnnonces((prev) => (page === 1 ? result.resultats : [...prev, ...result.resultats]));
+            setTotal(result.total);
+          })
+          .catch(() => setError("Impossible de charger le catalogue pour le moment."))
+          .finally(() => {
+            setLoading(false);
+            setLoadingMore(false);
+          });
+      },
+      page === 1 ? 300 : 0
+    );
+
+    return () => clearTimeout(timeout);
+  }, [q, categorie, region, tri, coords, rayonKm, page]);
 
   return (
     <div className="mx-auto flex max-w-[1280px] flex-col gap-8 px-6 py-12">
@@ -339,11 +354,24 @@ function CatalogView() {
           Aucune annonce ne correspond a votre recherche.
         </p>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {annonces.map((annonce) => (
-            <AnnonceCard key={annonce.id} annonce={annonce} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {annonces.map((annonce) => (
+              <AnnonceCard key={annonce.id} annonce={annonce} />
+            ))}
+          </div>
+
+          {annonces.length < total && (
+            <button
+              type="button"
+              disabled={loadingMore}
+              onClick={() => setPage((p) => p + 1)}
+              className="mx-auto w-fit rounded-lg border border-[#bfc9c1] px-6 py-2.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-black/5 disabled:opacity-60"
+            >
+              {loadingMore ? "Chargement..." : "Charger plus"}
+            </button>
+          )}
+        </>
       )}
     </div>
   );

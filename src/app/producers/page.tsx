@@ -9,25 +9,39 @@ export default function ProducersPage() {
   const [region, setRegion] = useState("");
   const [producteurs, setProducteurs] = useState<Producteur[]>([]);
   const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setLoading(true);
-      setError(null);
-
-      listProducteurs({ q: q || undefined, region: region || undefined })
-        .then((result) => {
-          setProducteurs(result.resultats);
-          setTotal(result.total);
-        })
-        .catch(() => setError("Impossible de charger les producteurs pour le moment."))
-        .finally(() => setLoading(false));
-    }, 300);
-
+    const timeout = setTimeout(() => setPage(1), 0);
     return () => clearTimeout(timeout);
   }, [q, region]);
+
+  useEffect(() => {
+    const timeout = setTimeout(
+      () => {
+        if (page === 1) setLoading(true);
+        else setLoadingMore(true);
+        setError(null);
+
+        listProducteurs({ q: q || undefined, region: region || undefined, page })
+          .then((result) => {
+            setProducteurs((prev) => (page === 1 ? result.resultats : [...prev, ...result.resultats]));
+            setTotal(result.total);
+          })
+          .catch(() => setError("Impossible de charger les producteurs pour le moment."))
+          .finally(() => {
+            setLoading(false);
+            setLoadingMore(false);
+          });
+      },
+      page === 1 ? 300 : 0
+    );
+
+    return () => clearTimeout(timeout);
+  }, [q, region, page]);
 
   return (
     <div className="mx-auto flex max-w-[1280px] flex-col gap-8 px-6 py-12">
@@ -78,6 +92,7 @@ export default function ProducersPage() {
           Aucun producteur ne correspond a votre recherche.
         </p>
       ) : (
+        <>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {producteurs.map((producteur) => (
             <div
@@ -131,6 +146,18 @@ export default function ProducersPage() {
             </div>
           ))}
         </div>
+
+        {producteurs.length < total && (
+          <button
+            type="button"
+            disabled={loadingMore}
+            onClick={() => setPage((p) => p + 1)}
+            className="mx-auto w-fit rounded-lg border border-[#bfc9c1] px-6 py-2.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-black/5 disabled:opacity-60"
+          >
+            {loadingMore ? "Chargement..." : "Charger plus"}
+          </button>
+        )}
+        </>
       )}
     </div>
   );
