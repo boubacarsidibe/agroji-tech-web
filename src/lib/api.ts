@@ -40,6 +40,42 @@ export type SearchAnnoncesResult = {
   resultats: Annonce[];
 };
 
+export type Utilisateur = {
+  id: string;
+  nom: string;
+  telephone: string;
+  roles: ("PRODUCTEUR" | "ACHETEUR" | "ADMIN")[];
+  verifie: boolean;
+};
+
+export type LoginResult = {
+  token: string;
+  utilisateur: Utilisateur;
+};
+
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
+export async function login(telephone: string, motDePasse: string): Promise<LoginResult> {
+  const res = await fetch(`${API_URL}/api/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ telephone, motDePasse }),
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Connexion impossible", res.status);
+  }
+
+  return body as LoginResult;
+}
+
 export async function searchAnnonces(
   params: SearchAnnoncesParams
 ): Promise<SearchAnnoncesResult> {

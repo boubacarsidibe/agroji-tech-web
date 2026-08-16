@@ -1,5 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useSyncExternalStore } from "react";
+import { useRouter } from "next/navigation";
+import { clearSession, getSession, subscribeToAuthChanges } from "@/lib/auth";
 
 const navLinks = [
   { label: "Catalog", href: "/catalog" },
@@ -9,6 +14,18 @@ const navLinks = [
 ];
 
 export default function Header() {
+  const router = useRouter();
+  const session = useSyncExternalStore(
+    subscribeToAuthChanges,
+    getSession,
+    () => null
+  );
+
+  function handleLogout() {
+    clearSession();
+    router.push("/");
+  }
+
   return (
     <header className="flex items-center justify-center border-b border-[#bfc9c1] bg-[#fbf8ff] drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)]">
       <div className="flex h-16 w-full max-w-[1280px] items-center justify-between px-4">
@@ -49,12 +66,27 @@ export default function Header() {
               <Image src="/icons/bell.svg" alt="" width={16} height={20} />
             </button>
           </div>
-          <Link
-            href="/login"
-            className="whitespace-nowrap rounded-full bg-[#0f5238] px-6 py-2 font-mono text-xs font-medium text-white drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)] hover:bg-[#0c4029]"
-          >
-            Login
-          </Link>
+          {session ? (
+            <div className="flex items-center gap-3">
+              <span className="whitespace-nowrap font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
+                {session.utilisateur.nom}
+              </span>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="whitespace-nowrap rounded-full border border-[#0f5238] px-6 py-2 font-mono text-xs font-medium text-[#0f5238] hover:bg-[#0f5238]/5"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="whitespace-nowrap rounded-full bg-[#0f5238] px-6 py-2 font-mono text-xs font-medium text-white drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)] hover:bg-[#0c4029]"
+            >
+              Login
+            </Link>
+          )}
         </div>
       </div>
     </header>
