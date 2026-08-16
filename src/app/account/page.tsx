@@ -3,6 +3,7 @@
 import { useEffect, useState, useSyncExternalStore, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
+  changerMotDePasse,
   deactivateMonCompte,
   deleteMonCompte,
   getMonProfil,
@@ -31,6 +32,12 @@ export default function AccountPage() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+
+  const [motDePasseActuel, setMotDePasseActuel] = useState("");
+  const [nouveauMotDePasse, setNouveauMotDePasse] = useState("");
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSaved, setPasswordSaved] = useState(false);
 
   const [confirmingDeactivate, setConfirmingDeactivate] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -82,6 +89,25 @@ export default function AccountPage() {
       setSaveError(err instanceof ApiError ? err.message : "Mise a jour impossible.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleChangePassword(e: FormEvent) {
+    e.preventDefault();
+    if (!session) return;
+    setPasswordSaving(true);
+    setPasswordError(null);
+
+    try {
+      await changerMotDePasse(session.token, { motDePasseActuel, nouveauMotDePasse });
+      setMotDePasseActuel("");
+      setNouveauMotDePasse("");
+      setPasswordSaved(true);
+      setTimeout(() => setPasswordSaved(false), 2000);
+    } catch (err) {
+      setPasswordError(err instanceof ApiError ? err.message : "Changement impossible.");
+    } finally {
+      setPasswordSaving(false);
     }
   }
 
@@ -212,6 +238,50 @@ export default function AccountPage() {
               className="mt-2 rounded-lg bg-[#0f5238] px-6 py-3 font-[family-name:var(--font-work-sans)] text-base font-semibold text-white hover:bg-[#0c4029] disabled:opacity-60"
             >
               {saved ? "Enregistre ✓" : saving ? "Enregistrement..." : "Enregistrer"}
+            </button>
+          </form>
+
+          <form
+            onSubmit={handleChangePassword}
+            className="flex flex-col gap-4 rounded-xl border border-[#dfe3e0] bg-white p-5"
+          >
+            <h2 className="font-sans text-lg font-semibold text-[#171c19]">Mot de passe</h2>
+
+            <label className="flex flex-col gap-1.5">
+              <span className={labelClass}>Mot de passe actuel</span>
+              <input
+                type="password"
+                required
+                value={motDePasseActuel}
+                onChange={(e) => setMotDePasseActuel(e.target.value)}
+                className={inputClass}
+              />
+            </label>
+
+            <label className="flex flex-col gap-1.5">
+              <span className={labelClass}>Nouveau mot de passe</span>
+              <input
+                type="password"
+                required
+                minLength={6}
+                value={nouveauMotDePasse}
+                onChange={(e) => setNouveauMotDePasse(e.target.value)}
+                className={inputClass}
+              />
+            </label>
+
+            {passwordError && (
+              <p className="rounded-lg bg-[#fdecea] px-4 py-3 font-[family-name:var(--font-work-sans)] text-sm text-[#7a1f14]">
+                {passwordError}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={passwordSaving}
+              className="mt-2 w-fit rounded-lg bg-[#0f5238] px-6 py-2.5 font-[family-name:var(--font-work-sans)] text-sm font-semibold text-white hover:bg-[#0c4029] disabled:opacity-60"
+            >
+              {passwordSaved ? "Modifie ✓" : passwordSaving ? "Modification..." : "Changer le mot de passe"}
             </button>
           </form>
 

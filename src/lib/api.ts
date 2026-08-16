@@ -758,6 +758,22 @@ export async function updateMonProfil(
   return body as MonProfil;
 }
 
+export async function changerMotDePasse(
+  token: string,
+  data: { motDePasseActuel: string; nouveauMotDePasse: string }
+): Promise<void> {
+  const res = await fetch(`${API_URL}/api/utilisateurs/me/password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Changement de mot de passe impossible", res.status);
+  }
+}
+
 export async function deactivateMonCompte(token: string): Promise<void> {
   const res = await fetch(`${API_URL}/api/utilisateurs/me/deactivate`, {
     method: "POST",
