@@ -130,6 +130,7 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
 
         <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
           {[annonce.ville, annonce.region].filter(Boolean).join(", ") || "Localisation non precisee"}
+          {annonce.distanceKm != null ? ` · ${annonce.distanceKm.toFixed(1)} km` : ""}
         </p>
 
         <div className="mt-auto flex items-center justify-between pt-2">

@@ -13,6 +13,7 @@ export type Annonce = {
   ville?: string | null;
   region?: string | null;
   miseEnAvant: boolean;
+  distanceKm?: number | null;
   producteur: {
     id: string;
     nom: string;
@@ -30,6 +31,9 @@ export type SearchAnnoncesParams = {
   producteurId?: string;
   prixMin?: number;
   prixMax?: number;
+  latitude?: number;
+  longitude?: number;
+  rayonKm?: number;
   tri?: "pertinence" | "proximite" | "prixAsc" | "prixDesc";
   page?: number;
 };

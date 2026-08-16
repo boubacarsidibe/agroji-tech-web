@@ -26,9 +26,12 @@ const categories: { value: Categorie | ""; label: string }[] = [
 
 const sortOptions = [
   { value: "pertinence", label: "Pertinence" },
+  { value: "proximite", label: "Proximite" },
   { value: "prixAsc", label: "Prix croissant" },
   { value: "prixDesc", label: "Prix decroissant" },
 ] as const;
+
+const rayonOptions = [10, 25, 50, 100, 200];
 
 export default function CatalogPage() {
   return (
@@ -57,6 +60,38 @@ function CatalogView() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
+  const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [rayonKm, setRayonKm] = useState(50);
+  const [geoLoading, setGeoLoading] = useState(false);
+  const [geoError, setGeoError] = useState<string | null>(null);
+
+  function handleToggleNearMe() {
+    if (coords) {
+      setCoords(null);
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      setGeoError("La geolocalisation n'est pas disponible sur cet appareil.");
+      return;
+    }
+
+    setGeoLoading(true);
+    setGeoError(null);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCoords({ latitude: position.coords.latitude, longitude: position.coords.longitude });
+        setTri("proximite");
+        setGeoLoading(false);
+      },
+      () => {
+        setGeoError("Impossible d'acceder a votre position. Verifiez les autorisations.");
+        setGeoLoading(false);
+      },
+      { timeout: 10_000 }
+    );
+  }
+
   useEffect(() => {
     if (!session) return;
     listRecherches(session.token)
@@ -77,6 +112,9 @@ function CatalogView() {
           categorie: categorie || undefined,
           region: region || undefined,
           tri,
+          latitude: coords?.latitude,
+          longitude: coords?.longitude,
+          rayonKm: coords ? rayonKm : undefined,
         },
       });
       setRecherches((prev) => [created, ...prev]);
@@ -104,6 +142,12 @@ function CatalogView() {
     setCategorie(recherche.criteres.categorie ?? "");
     setRegion(recherche.criteres.region ?? "");
     setTri(recherche.criteres.tri ?? "pertinence");
+    if (recherche.criteres.latitude != null && recherche.criteres.longitude != null) {
+      setCoords({ latitude: recherche.criteres.latitude, longitude: recherche.criteres.longitude });
+      setRayonKm(recherche.criteres.rayonKm ?? 50);
+    } else {
+      setCoords(null);
+    }
     setShowRecherches(false);
   }
 
@@ -117,6 +161,9 @@ function CatalogView() {
         categorie: categorie || undefined,
         region: region || undefined,
         tri,
+        latitude: coords?.latitude,
+        longitude: coords?.longitude,
+        rayonKm: coords ? rayonKm : undefined,
       })
         .then((result) => {
           setAnnonces(result.resultats);
@@ -127,7 +174,7 @@ function CatalogView() {
     }, 300);
 
     return () => clearTimeout(timeout);
-  }, [q, categorie, region, tri]);
+  }, [q, categorie, region, tri, coords, rayonKm]);
 
   return (
     <div className="mx-auto flex max-w-[1280px] flex-col gap-8 px-6 py-12">
@@ -175,6 +222,33 @@ function CatalogView() {
             </option>
           ))}
         </select>
+
+        <button
+          type="button"
+          disabled={geoLoading}
+          onClick={handleToggleNearMe}
+          className={`whitespace-nowrap rounded-lg border px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium disabled:opacity-60 ${
+            coords
+              ? "border-[#0f5238] bg-[#0f5238] text-white"
+              : "border-[#bfc9c1] text-[#404943] hover:bg-black/5"
+          }`}
+        >
+          {geoLoading ? "Localisation..." : coords ? "✕ Pres de moi" : "📍 Pres de moi"}
+        </button>
+
+        {coords && (
+          <select
+            value={rayonKm}
+            onChange={(e) => setRayonKm(Number(e.target.value))}
+            className="rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+          >
+            {rayonOptions.map((r) => (
+              <option key={r} value={r}>
+                {r} km
+              </option>
+            ))}
+          </select>
+        )}
 
         {session && (
           <div className="relative flex items-center gap-2">
@@ -233,6 +307,12 @@ function CatalogView() {
       {saveError && (
         <p className="rounded-lg bg-[#fdecea] px-4 py-3 font-[family-name:var(--font-work-sans)] text-sm text-[#7a1f14]">
           {saveError}
+        </p>
+      )}
+
+      {geoError && (
+        <p className="rounded-lg bg-[#fdecea] px-4 py-3 font-[family-name:var(--font-work-sans)] text-sm text-[#7a1f14]">
+          {geoError}
         </p>
       )}
 
