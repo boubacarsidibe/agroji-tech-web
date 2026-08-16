@@ -1,4 +1,12 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Centre d'aide",
+  description:
+    "Questions frequentes sur AgroJi-Tech : commander des plants, devenir producteur, suivre une commande, signaler une annonce.",
+  alternates: { canonical: "/support" },
+};
 
 const faqs = [
   {
@@ -33,9 +41,24 @@ const faqs = [
   },
 ];
 
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: { "@type": "Answer", text: faq.answer },
+  })),
+};
+
 export default function SupportPage() {
   return (
     <div className="mx-auto flex max-w-[720px] flex-col gap-10 px-6 py-24">
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger -- static, non-user-controlled JSON-LD
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <div className="flex flex-col gap-2">
         <h1 className="font-sans text-3xl font-bold text-[#171c19]">Centre d&apos;aide</h1>
         <p className="font-[family-name:var(--font-work-sans)] text-base text-[#404943]">

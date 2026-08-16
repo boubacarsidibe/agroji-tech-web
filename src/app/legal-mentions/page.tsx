@@ -1,4 +1,12 @@
+import type { Metadata } from "next";
 import LegalPage from "@/components/LegalPage";
+
+export const metadata: Metadata = {
+  title: "Mentions legales",
+  description: "Mentions legales de la plateforme AgroJi-Tech.",
+  alternates: { canonical: "/legal-mentions" },
+  robots: { index: false, follow: true },
+};
 
 export default function LegalMentionsPage() {
   return (

@@ -1,4 +1,12 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Contact",
+  description:
+    "Contactez l'equipe AgroJi-Tech par telephone, email ou pour toute question sur une commande ou un compte producteur.",
+  alternates: { canonical: "/contact" },
+};
 
 const channels = [
   {

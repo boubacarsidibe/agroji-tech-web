@@ -1,3 +1,12 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Conseils agricoles",
+  description:
+    "Conseils de plantation et d'entretien pour manguiers, plants maraichers, especes forestieres et ornementales au Senegal.",
+  alternates: { canonical: "/agricultural-advice" },
+};
+
 const articles = [
   {
     categorie: "Fruitier",

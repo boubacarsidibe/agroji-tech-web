@@ -1,4 +1,12 @@
+import type { Metadata } from "next";
 import LegalPage from "@/components/LegalPage";
+
+export const metadata: Metadata = {
+  title: "Conditions d'utilisation",
+  description: "Conditions d'utilisation de la plateforme AgroJi-Tech.",
+  alternates: { canonical: "/terms-of-service" },
+  robots: { index: false, follow: true },
+};
 
 export default function TermsOfServicePage() {
   return (
