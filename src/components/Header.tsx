@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
@@ -60,26 +59,11 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-4">
-          <div className="hidden items-center gap-1 sm:flex">
-            <button
-              type="button"
-              aria-label="Cart"
-              className="flex size-10 items-center justify-center rounded-full hover:bg-black/5"
-            >
-              <Image src="/icons/cart.svg" alt="" width={20} height={20} />
-            </button>
-            {session ? (
+          {session && (
+            <div className="hidden items-center gap-1 sm:flex">
               <NotificationBell session={session} />
-            ) : (
-              <button
-                type="button"
-                aria-label="Notifications"
-                className="flex size-10 items-center justify-center rounded-full hover:bg-black/5"
-              >
-                <Image src="/icons/bell.svg" alt="" width={16} height={20} />
-              </button>
-            )}
-          </div>
+            </div>
+          )}
 
           <div className="hidden items-center gap-3 md:flex">
             {session ? (
@@ -115,12 +99,20 @@ export default function Header() {
                 </button>
               </div>
             ) : (
-              <Link
-                href="/login"
-                className="whitespace-nowrap rounded-full bg-[#0f5238] px-6 py-2 font-mono text-xs font-medium text-white drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)] hover:bg-[#0c4029]"
-              >
-                Login
-              </Link>
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/register"
+                  className="whitespace-nowrap font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:text-[#0f5238]"
+                >
+                  S&apos;inscrire
+                </Link>
+                <Link
+                  href="/login"
+                  className="whitespace-nowrap rounded-full bg-[#0f5238] px-6 py-2 font-mono text-xs font-medium text-white drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)] hover:bg-[#0c4029]"
+                >
+                  Login
+                </Link>
+              </div>
             )}
           </div>
 
@@ -201,13 +193,22 @@ export default function Header() {
               </div>
             </>
           ) : (
-            <Link
-              href="/login"
-              onClick={handleNavClick}
-              className="mt-2 rounded-lg bg-[#0f5238] px-3 py-2.5 text-center font-mono text-sm font-medium text-white hover:bg-[#0c4029]"
-            >
-              Login
-            </Link>
+            <div className="mt-2 flex flex-col gap-2">
+              <Link
+                href="/register"
+                onClick={handleNavClick}
+                className="rounded-lg border border-[#0f5238] px-3 py-2.5 text-center font-mono text-sm font-medium text-[#0f5238] hover:bg-[#0f5238]/5"
+              >
+                S&apos;inscrire
+              </Link>
+              <Link
+                href="/login"
+                onClick={handleNavClick}
+                className="rounded-lg bg-[#0f5238] px-3 py-2.5 text-center font-mono text-sm font-medium text-white hover:bg-[#0c4029]"
+              >
+                Login
+              </Link>
+            </div>
           )}
         </nav>
       )}

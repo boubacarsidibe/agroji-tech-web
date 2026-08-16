@@ -92,8 +92,8 @@ export default function LoginPage() {
 
         <p className="text-center font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
           Pas encore de compte ?{" "}
-          <Link href="/producers/register" className="font-medium text-[#0f5238] hover:underline">
-            Devenir producteur
+          <Link href="/register" className="font-medium text-[#0f5238] hover:underline">
+            S&apos;inscrire
           </Link>
         </p>
       </form>

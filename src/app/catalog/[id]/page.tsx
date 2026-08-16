@@ -227,7 +227,11 @@ export default function AnnonceDetailPage() {
             </p>
           )}
 
-          {sent ? (
+          {annonce.statut !== "DISPONIBLE" ? (
+            <p className="rounded-lg bg-[#eef3ef] px-4 py-3 text-center font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#7c8a80]">
+              Cette annonce n&apos;est plus disponible
+            </p>
+          ) : sent ? (
             <p className="rounded-lg bg-[#e3f3ea] px-4 py-3 text-center font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#0f5238]">
               Demande envoyee
             </p>
