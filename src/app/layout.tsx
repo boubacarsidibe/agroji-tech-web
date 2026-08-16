@@ -22,7 +22,7 @@ const workSans = Work_Sans({
 export const metadata: Metadata = {
   title: "AgroJi-Tech",
   description:
-    "Cultivating Digital Empowerment across Senegal's agricultural landscape.",
+    "La plateforme qui connecte les pepinieristes et les acheteurs de plants au Senegal.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
