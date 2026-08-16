@@ -1,4 +1,9 @@
-import type { Annonce } from "@/lib/api";
+"use client";
+
+import { useState, useSyncExternalStore } from "react";
+import { useRouter } from "next/navigation";
+import { createCommande, ApiError, type Annonce } from "@/lib/api";
+import { getSession, subscribeToAuthChanges } from "@/lib/auth";
 
 const categorieLabels: Record<Annonce["categorie"], string> = {
   FRUITIER: "Fruitier",
@@ -8,7 +13,40 @@ const categorieLabels: Record<Annonce["categorie"], string> = {
 };
 
 export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
+  const router = useRouter();
+  const session = useSyncExternalStore(subscribeToAuthChanges, getSession, () => null);
   const photo = annonce.photos[0];
+
+  const [ordering, setOrdering] = useState(false);
+  const [quantite, setQuantite] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [sent, setSent] = useState(false);
+
+  function handleOrderClick() {
+    if (!session) {
+      router.push("/login");
+      return;
+    }
+    setError(null);
+    setOrdering(true);
+  }
+
+  async function handleConfirm() {
+    if (!session) return;
+    setLoading(true);
+    setError(null);
+
+    try {
+      await createCommande(session.token, { annonceId: annonce.id, quantiteDemandee: quantite });
+      setSent(true);
+      setOrdering(false);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Impossible d'envoyer la demande.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="flex flex-col overflow-hidden rounded-xl border border-[#dfe3e0] bg-white shadow-sm transition hover:shadow-md">
@@ -61,6 +99,52 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
             ? ` · ${annonce.producteur.noteMoyenne.toFixed(1)}★`
             : ""}
         </p>
+
+        {error && (
+          <p className="rounded-lg bg-[#fdecea] px-3 py-2 font-[family-name:var(--font-work-sans)] text-xs text-[#7a1f14]">
+            {error}
+          </p>
+        )}
+
+        {sent ? (
+          <p className="rounded-lg bg-[#e3f3ea] px-3 py-2 text-center font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#0f5238]">
+            Demande envoyee
+          </p>
+        ) : ordering ? (
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              min={1}
+              max={annonce.quantite}
+              value={quantite}
+              onChange={(e) => setQuantite(Number(e.target.value))}
+              className="w-16 rounded-lg border border-[#bfc9c1] px-2 py-1.5 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+            />
+            <button
+              type="button"
+              disabled={loading}
+              onClick={handleConfirm}
+              className="flex-1 rounded-lg bg-[#0f5238] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#0c4029] disabled:opacity-60"
+            >
+              {loading ? "Envoi..." : "Confirmer"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setOrdering(false)}
+              className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:bg-black/5"
+            >
+              Annuler
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={handleOrderClick}
+            className="rounded-lg bg-[#0f5238] px-3 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#0c4029]"
+          >
+            Commander
+          </button>
+        )}
       </div>
     </div>
   );

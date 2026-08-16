@@ -122,6 +122,74 @@ export async function verifyAccount(telephone: string, code: string): Promise<Lo
   return body as LoginResult;
 }
 
+export type StatutCommande = "ENVOYEE" | "ACCEPTEE" | "REFUSEE" | "FINALISEE";
+
+export type Commande = {
+  id: string;
+  annonceId: string;
+  acheteurId: string;
+  producteurId: string;
+  quantiteDemandee: number;
+  message?: string | null;
+  statut: StatutCommande;
+  createdAt: string;
+  annonce: Pick<Annonce, "id" | "espece" | "variete" | "prixUnitaire" | "photos">;
+};
+
+export async function createCommande(
+  token: string,
+  data: { annonceId: string; quantiteDemandee: number; message?: string }
+): Promise<Commande> {
+  const res = await fetch(`${API_URL}/api/commandes`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible d'envoyer la demande", res.status);
+  }
+
+  return body as Commande;
+}
+
+export async function listCommandes(
+  token: string,
+  role: "acheteur" | "producteur"
+): Promise<Commande[]> {
+  const res = await fetch(`${API_URL}/api/commandes?role=${role}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible de charger les commandes", res.status);
+  }
+
+  return body as Commande[];
+}
+
+export async function updateCommandeStatut(
+  token: string,
+  id: string,
+  statut: Exclude<StatutCommande, "ENVOYEE">
+): Promise<Commande> {
+  const res = await fetch(`${API_URL}/api/commandes/${id}/statut`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ statut }),
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Mise a jour impossible", res.status);
+  }
+
+  return body as Commande;
+}
+
 export async function searchAnnonces(
   params: SearchAnnoncesParams
 ): Promise<SearchAnnoncesResult> {
