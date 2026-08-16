@@ -1,16 +1,42 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   listNotifications,
   markAllNotificationsAsRead,
   markNotificationAsRead,
   type Notification,
+  type TypeNotification,
 } from "@/lib/api";
 import type { Session } from "@/lib/auth";
 
 const POLL_INTERVAL_MS = 30_000;
+
+const typeLabels: Record<TypeNotification, string> = {
+  NOUVELLE_DEMANDE: "Nouvelle demande",
+  MISE_A_JOUR_COMMANDE: "Commande",
+  MESSAGE: "Information",
+  ALERTE_RECHERCHE: "Alerte recherche",
+};
+
+const typeColors: Record<TypeNotification, string> = {
+  NOUVELLE_DEMANDE: "bg-[#e3f3ea] text-[#0f5238]",
+  MISE_A_JOUR_COMMANDE: "bg-[#e8f0fe] text-[#1d4ed8]",
+  MESSAGE: "bg-[#eef3ef] text-[#404943]",
+  ALERTE_RECHERCHE: "bg-[#fdf3e0] text-[#b45309]",
+};
+
+// Notifications don't yet carry a stored deep link, so route by type: the
+// two commande-related types are always safe to send to /orders. MESSAGE
+// covers several unrelated cases (annonce archived, verified, signalement
+// traite) with no shared destination, so it stays non-navigable.
+const typeDestination: Partial<Record<TypeNotification, string>> = {
+  NOUVELLE_DEMANDE: "/orders",
+  MISE_A_JOUR_COMMANDE: "/orders",
+  ALERTE_RECHERCHE: "/catalog",
+};
 
 function timeAgo(iso: string): string {
   const seconds = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
@@ -20,10 +46,18 @@ function timeAgo(iso: string): string {
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return `il y a ${hours} h`;
   const days = Math.floor(hours / 24);
-  return `il y a ${days} j`;
+  if (days < 7) return `il y a ${days} j`;
+  return new Date(iso).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 export default function NotificationBell({ session }: { session: Session }) {
+  const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -69,14 +103,21 @@ export default function NotificationBell({ session }: { session: Session }) {
   }
 
   async function handleNotificationClick(notification: Notification) {
-    if (notification.lu) return;
-    try {
-      await markNotificationAsRead(session.token, notification.id);
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === notification.id ? { ...n, lu: true } : n))
-      );
-    } catch {
-      // ignore
+    if (!notification.lu) {
+      try {
+        await markNotificationAsRead(session.token, notification.id);
+        setNotifications((prev) =>
+          prev.map((n) => (n.id === notification.id ? { ...n, lu: true } : n))
+        );
+      } catch {
+        // ignore
+      }
+    }
+
+    const destination = typeDestination[notification.type];
+    if (destination) {
+      setOpen(false);
+      router.push(destination);
     }
   }
 
@@ -117,23 +158,43 @@ export default function NotificationBell({ session }: { session: Session }) {
                 Aucune notification.
               </p>
             ) : (
-              notifications.map((notification) => (
-                <button
-                  key={notification.id}
-                  type="button"
-                  onClick={() => handleNotificationClick(notification)}
-                  className={`flex w-full flex-col gap-1 border-b border-[#eef3ef] px-4 py-3 text-left last:border-b-0 hover:bg-[#eef3ef]/60 ${
-                    notification.lu ? "" : "bg-[#e3f3ea]/50"
-                  }`}
-                >
-                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#171c19]">
-                    {notification.contenu}
-                  </p>
-                  <span className="font-[family-name:var(--font-work-sans)] text-xs text-[#7c8a80]">
-                    {timeAgo(notification.createdAt)}
-                  </span>
-                </button>
-              ))
+              notifications.map((notification) => {
+                const clickable = Boolean(typeDestination[notification.type]);
+                return (
+                  <button
+                    key={notification.id}
+                    type="button"
+                    onClick={() => handleNotificationClick(notification)}
+                    className={`flex w-full flex-col gap-1.5 border-b border-[#eef3ef] px-4 py-3 text-left last:border-b-0 hover:bg-[#eef3ef]/60 ${
+                      notification.lu ? "" : "bg-[#e3f3ea]/50"
+                    } ${clickable ? "cursor-pointer" : "cursor-default"}`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span
+                        className={`whitespace-nowrap rounded-full px-2 py-0.5 font-mono text-[10px] font-medium ${typeColors[notification.type]}`}
+                      >
+                        {typeLabels[notification.type]}
+                      </span>
+                      {!notification.lu && (
+                        <span className="size-1.5 shrink-0 rounded-full bg-[#0f5238]" />
+                      )}
+                    </div>
+                    <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#171c19]">
+                      {notification.contenu}
+                    </p>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-[family-name:var(--font-work-sans)] text-xs text-[#7c8a80]">
+                        {timeAgo(notification.createdAt)}
+                      </span>
+                      {clickable && (
+                        <span className="whitespace-nowrap font-[family-name:var(--font-work-sans)] text-xs font-medium text-[#0f5238]">
+                          Voir →
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                );
+              })
             )}
           </div>
         </div>

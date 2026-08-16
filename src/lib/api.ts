@@ -430,9 +430,15 @@ export async function deleteAnnonce(token: string, id: string): Promise<void> {
   }
 }
 
+export type TypeNotification =
+  | "MESSAGE"
+  | "NOUVELLE_DEMANDE"
+  | "MISE_A_JOUR_COMMANDE"
+  | "ALERTE_RECHERCHE";
+
 export type Notification = {
   id: string;
-  type: string;
+  type: TypeNotification;
   contenu: string;
   lu: boolean;
   createdAt: string;
