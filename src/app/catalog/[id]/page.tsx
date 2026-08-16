@@ -44,6 +44,7 @@ export default function AnnonceDetailPage() {
   const { commandes: mesCommandes } = useMesCommandesAcheteur(session);
 
   const [annonce, setAnnonce] = useState<AnnonceDetail | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState(0);
   const [evaluations, setEvaluations] = useState<EvaluationAvecAuteur[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,6 +69,7 @@ export default function AnnonceDetailPage() {
       getAnnonce(params.id)
         .then((a) => {
           setAnnonce(a);
+          setSelectedPhoto(0);
           return listEvaluationsPourUtilisateur(a.producteur.id);
         })
         .then(setEvaluations)
@@ -165,23 +167,43 @@ export default function AnnonceDetailPage() {
       </Link>
 
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-[#eef3ef]">
-          {annonce.photos[0] ? (
-            // eslint-disable-next-line @next/next/no-img-element -- photo host is user-provided, unknown at build time
-            <img
-              src={annonce.photos[0]}
-              alt={annonce.espece}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center text-sm text-[#7c8a80]">
-              Pas de photo
+        <div className="flex flex-col gap-2">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-[#eef3ef]">
+            {annonce.photos[selectedPhoto] ? (
+              // eslint-disable-next-line @next/next/no-img-element -- photo host is user-provided, unknown at build time
+              <img
+                src={annonce.photos[selectedPhoto]}
+                alt={annonce.espece}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-sm text-[#7c8a80]">
+                Pas de photo
+              </div>
+            )}
+            {annonce.miseEnAvant && (
+              <span className="absolute left-3 top-3 rounded-full bg-[#0f5238] px-3 py-1 font-mono text-xs font-medium text-white">
+                En avant
+              </span>
+            )}
+          </div>
+
+          {annonce.photos.length > 1 && (
+            <div className="flex gap-2">
+              {annonce.photos.map((photo, i) => (
+                <button
+                  key={photo + i}
+                  type="button"
+                  onClick={() => setSelectedPhoto(i)}
+                  className={`size-16 shrink-0 overflow-hidden rounded-lg border-2 ${
+                    i === selectedPhoto ? "border-[#0f5238]" : "border-transparent"
+                  }`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element -- photo host is user-provided, unknown at build time */}
+                  <img src={photo} alt="" className="h-full w-full object-cover" />
+                </button>
+              ))}
             </div>
-          )}
-          {annonce.miseEnAvant && (
-            <span className="absolute left-3 top-3 rounded-full bg-[#0f5238] px-3 py-1 font-mono text-xs font-medium text-white">
-              En avant
-            </span>
           )}
         </div>
 
