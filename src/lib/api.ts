@@ -523,6 +523,28 @@ export async function traiterSignalement(
   return body as Signalement;
 }
 
+export type AnnonceAdmin = MonAnnonce & {
+  producteur: { id: string; nom: string; telephone: string; ville?: string | null; region?: string | null };
+};
+
+export async function listToutesAnnonces(
+  token: string,
+  statut?: StatutAnnonce
+): Promise<AnnonceAdmin[]> {
+  const query = statut ? `?statut=${statut}` : "";
+  const res = await fetch(`${API_URL}/api/admin/annonces${query}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible de charger les annonces", res.status);
+  }
+
+  return body as AnnonceAdmin[];
+}
+
 export async function archiverAnnonceAdmin(token: string, id: string): Promise<void> {
   const res = await fetch(`${API_URL}/api/admin/annonces/${id}/archiver`, {
     method: "POST",

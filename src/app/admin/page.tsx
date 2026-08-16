@@ -4,19 +4,25 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import {
   archiverAnnonceAdmin,
+  deleteAnnonce,
   getAdminDashboard,
   listSignalements,
+  listToutesAnnonces,
   listUtilisateurs,
   suspendreUtilisateur,
   traiterSignalement,
+  updateAnnonce,
   verifierUtilisateur,
   ApiError,
   type AdminDashboard,
+  type AnnonceAdmin,
   type Producteur,
   type Signalement,
+  type StatutAnnonce,
   type StatutSignalement,
 } from "@/lib/api";
 import { getSession, subscribeToAuthChanges } from "@/lib/auth";
+import { categorieColors } from "@/lib/colors";
 
 const statutLabels: Record<StatutSignalement, string> = {
   OUVERT: "Ouvert",
@@ -28,6 +34,18 @@ const statutColors: Record<StatutSignalement, string> = {
   OUVERT: "bg-[#fdecea] text-[#7a1f14]",
   TRAITE: "bg-[#e3f3ea] text-[#0f5238]",
   REJETE: "bg-[#eef3ef] text-[#404943]",
+};
+
+const annonceStatutLabels: Record<StatutAnnonce, string> = {
+  DISPONIBLE: "Disponible",
+  RUPTURE: "Rupture",
+  ARCHIVEE: "Archivee",
+};
+
+const annonceStatutColors: Record<StatutAnnonce, string> = {
+  DISPONIBLE: "bg-[#e3f3ea] text-[#0f5238]",
+  RUPTURE: "bg-[#fdecea] text-[#7a1f14]",
+  ARCHIVEE: "bg-[#eef3ef] text-[#404943]",
 };
 
 export default function AdminPage() {
@@ -46,6 +64,11 @@ export default function AdminPage() {
   const [roleFiltre, setRoleFiltre] = useState<"" | "PRODUCTEUR" | "ACHETEUR">("");
   const [usersLoading, setUsersLoading] = useState(true);
   const [userActionId, setUserActionId] = useState<string | null>(null);
+
+  const [annonces, setAnnonces] = useState<AnnonceAdmin[]>([]);
+  const [annonceStatutFiltre, setAnnonceStatutFiltre] = useState<StatutAnnonce | "">("");
+  const [annoncesLoading, setAnnoncesLoading] = useState(true);
+  const [annonceActionId, setAnnonceActionId] = useState<string | null>(null);
 
   useEffect(() => {
     if (session === null) router.push("/login");
@@ -86,6 +109,46 @@ export default function AdminPage() {
 
     return () => clearTimeout(timeout);
   }, [session, isAdmin, roleFiltre]);
+
+  useEffect(() => {
+    if (!session || !isAdmin) return;
+
+    const timeout = setTimeout(() => {
+      setAnnoncesLoading(true);
+      listToutesAnnonces(session.token, annonceStatutFiltre || undefined)
+        .then(setAnnonces)
+        .catch(() => setError("Impossible de charger les annonces."))
+        .finally(() => setAnnoncesLoading(false));
+    }, 0);
+
+    return () => clearTimeout(timeout);
+  }, [session, isAdmin, annonceStatutFiltre]);
+
+  async function handleAnnonceStatutChange(id: string, statut: StatutAnnonce) {
+    if (!session) return;
+    setAnnonceActionId(id);
+    try {
+      const updated = await updateAnnonce(session.token, id, { statut });
+      setAnnonces((prev) => prev.map((a) => (a.id === id ? { ...a, ...updated } : a)));
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Mise a jour impossible.");
+    } finally {
+      setAnnonceActionId(null);
+    }
+  }
+
+  async function handleAnnonceDelete(id: string) {
+    if (!session) return;
+    setAnnonceActionId(id);
+    try {
+      await deleteAnnonce(session.token, id);
+      setAnnonces((prev) => prev.filter((a) => a.id !== id));
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Suppression impossible.");
+    } finally {
+      setAnnonceActionId(null);
+    }
+  }
 
   async function handleSuspendre(id: string) {
     if (!session) return;
@@ -209,6 +272,89 @@ export default function AdminPage() {
             </span>
           </div>
         ))}
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-sans text-xl font-semibold text-[#171c19]">
+            Annonces ({annonces.length})
+          </h2>
+          <select
+            value={annonceStatutFiltre}
+            onChange={(e) => setAnnonceStatutFiltre(e.target.value as StatutAnnonce | "")}
+            className="rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+          >
+            <option value="">Tous les statuts</option>
+            <option value="DISPONIBLE">Disponible</option>
+            <option value="RUPTURE">Rupture</option>
+            <option value="ARCHIVEE">Archivee</option>
+          </select>
+        </div>
+
+        {annoncesLoading ? (
+          <div className="flex flex-col gap-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-20 animate-pulse rounded-xl bg-[#eef3ef]" />
+            ))}
+          </div>
+        ) : annonces.length === 0 ? (
+          <p className="py-16 text-center font-[family-name:var(--font-work-sans)] text-base text-[#7c8a80]">
+            Aucune annonce ne correspond a ce filtre.
+          </p>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {annonces.map((annonce) => (
+              <div
+                key={annonce.id}
+                className={`flex flex-col gap-3 overflow-hidden rounded-xl border-l-4 border-[#dfe3e0] bg-white p-4 sm:flex-row sm:items-center sm:justify-between ${categorieColors[annonce.categorie].ring.replace("border-", "border-l-")}`}
+              >
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-sans text-base font-semibold text-[#171c19]">
+                      {annonce.espece}
+                      {annonce.variete ? ` · ${annonce.variete}` : ""}
+                    </p>
+                    <span
+                      className={`whitespace-nowrap rounded-full px-2 py-0.5 font-mono text-xs font-medium ${annonceStatutColors[annonce.statut]}`}
+                    >
+                      {annonceStatutLabels[annonce.statut]}
+                    </span>
+                  </div>
+                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+                    Par {annonce.producteur.nom} ({annonce.producteur.telephone})
+                    {annonce.producteur.region ? ` · ${annonce.producteur.region}` : ""}
+                  </p>
+                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
+                    {annonce.quantite} en stock · {annonce.prixUnitaire.toLocaleString("fr-FR")} FCFA/unite
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <select
+                    value={annonce.statut}
+                    disabled={annonceActionId === annonce.id}
+                    onChange={(e) => handleAnnonceStatutChange(annonce.id, e.target.value as StatutAnnonce)}
+                    className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238] disabled:opacity-60"
+                  >
+                    {(Object.keys(annonceStatutLabels) as StatutAnnonce[]).map((s) => (
+                      <option key={s} value={s}>
+                        {annonceStatutLabels[s]}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    disabled={annonceActionId === annonce.id}
+                    onClick={() => handleAnnonceDelete(annonce.id)}
+                    className="whitespace-nowrap rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#7a1f14] hover:bg-black/5 disabled:opacity-60"
+                  >
+                    Supprimer
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col gap-4">
