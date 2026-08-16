@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import AnnonceCard from "@/components/AnnonceCard";
 import { searchAnnonces, type Annonce, type Categorie } from "@/lib/api";
 
@@ -19,9 +20,18 @@ const sortOptions = [
 ] as const;
 
 export default function CatalogPage() {
+  return (
+    <Suspense fallback={null}>
+      <CatalogView />
+    </Suspense>
+  );
+}
+
+function CatalogView() {
+  const searchParams = useSearchParams();
   const [q, setQ] = useState("");
   const [categorie, setCategorie] = useState<Categorie | "">("");
-  const [region, setRegion] = useState("");
+  const [region, setRegion] = useState(searchParams.get("region") ?? "");
   const [tri, setTri] = useState<(typeof sortOptions)[number]["value"]>("pertinence");
 
   const [annonces, setAnnonces] = useState<Annonce[]>([]);

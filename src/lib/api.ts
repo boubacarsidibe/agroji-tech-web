@@ -190,6 +190,51 @@ export async function updateCommandeStatut(
   return body as Commande;
 }
 
+export type Producteur = {
+  id: string;
+  nom: string;
+  photoUrl?: string | null;
+  description?: string | null;
+  ville?: string | null;
+  region?: string | null;
+  roles: Utilisateur["roles"];
+  verifie: boolean;
+  noteMoyenne: number;
+  nombreAvis: number;
+};
+
+export type ListProducteursParams = {
+  q?: string;
+  region?: string;
+  page?: number;
+};
+
+export type ListProducteursResult = {
+  total: number;
+  page: number;
+  limite: number;
+  resultats: Producteur[];
+};
+
+export async function listProducteurs(
+  params: ListProducteursParams
+): Promise<ListProducteursResult> {
+  const query = new URLSearchParams({ role: "PRODUCTEUR" });
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== "") query.set(key, String(value));
+  }
+
+  const res = await fetch(`${API_URL}/api/utilisateurs?${query.toString()}`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error(`Echec du chargement des producteurs (${res.status})`);
+  }
+
+  return res.json();
+}
+
 export async function searchAnnonces(
   params: SearchAnnoncesParams
 ): Promise<SearchAnnoncesResult> {
