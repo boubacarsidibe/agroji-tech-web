@@ -15,6 +15,7 @@ import {
 } from "@/lib/api";
 import { getSession, subscribeToAuthChanges } from "@/lib/auth";
 import { categorieColors } from "@/lib/colors";
+import LocationPicker, { type LatLng } from "@/components/LocationPicker";
 
 const categories: { value: Categorie; label: string }[] = [
   { value: "FRUITIER", label: "Fruitier" },
@@ -64,6 +65,7 @@ export default function DashboardPage() {
   const [prixUnitaire, setPrixUnitaire] = useState(0);
   const [ville, setVille] = useState("");
   const [region, setRegion] = useState("");
+  const [position, setPosition] = useState<LatLng | null>(null);
   const [photos, setPhotos] = useState<string[]>([""]);
   const [creating, setCreating] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -81,6 +83,7 @@ export default function DashboardPage() {
   const [editPrixUnitaire, setEditPrixUnitaire] = useState(0);
   const [editVille, setEditVille] = useState("");
   const [editRegion, setEditRegion] = useState("");
+  const [editPosition, setEditPosition] = useState<LatLng | null>(null);
   const [savingDetails, setSavingDetails] = useState(false);
   const [detailsError, setDetailsError] = useState<string | null>(null);
 
@@ -151,6 +154,11 @@ export default function DashboardPage() {
     setEditPrixUnitaire(annonce.prixUnitaire);
     setEditVille(annonce.ville ?? "");
     setEditRegion(annonce.region ?? "");
+    setEditPosition(
+      annonce.latitude != null && annonce.longitude != null
+        ? { latitude: annonce.latitude, longitude: annonce.longitude }
+        : null
+    );
     setDetailsError(null);
     setEditingDetailsId(annonce.id);
   }
@@ -168,6 +176,8 @@ export default function DashboardPage() {
         prixUnitaire: editPrixUnitaire,
         ville: editVille || undefined,
         region: editRegion || undefined,
+        latitude: editPosition?.latitude,
+        longitude: editPosition?.longitude,
       });
       setAnnonces((prev) => prev.map((a) => (a.id === id ? updated : a)));
       setEditingDetailsId(null);
@@ -213,6 +223,8 @@ export default function DashboardPage() {
         prixUnitaire,
         ville: ville || undefined,
         region: region || undefined,
+        latitude: position?.latitude,
+        longitude: position?.longitude,
         photos: photos.map((p) => p.trim()).filter(Boolean),
       });
       setAnnonces((prev) => [created, ...prev]);
@@ -222,6 +234,7 @@ export default function DashboardPage() {
       setPrixUnitaire(0);
       setVille("");
       setRegion("");
+      setPosition(null);
       setPhotos([""]);
       setShowForm(false);
     } catch (err) {
@@ -372,6 +385,8 @@ export default function DashboardPage() {
               className={inputClass}
             />
           </label>
+
+          <LocationPicker value={position} onChange={setPosition} />
 
           <div className="flex flex-col gap-1.5">
             <span className={labelClass}>Photos (URL, optionnel, 5 max)</span>
@@ -638,6 +653,8 @@ export default function DashboardPage() {
                       className={inputClass}
                     />
                   </label>
+
+                  <LocationPicker value={editPosition} onChange={setEditPosition} />
 
                   {detailsError && (
                     <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7a1f14]">

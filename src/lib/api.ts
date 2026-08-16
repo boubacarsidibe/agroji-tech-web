@@ -12,6 +12,8 @@ export type Annonce = {
   photos: string[];
   ville?: string | null;
   region?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   miseEnAvant: boolean;
   distanceKm?: number | null;
   producteur: {
@@ -344,6 +346,8 @@ export type AnnonceInput = {
   ville?: string;
   region?: string;
   photos?: string[];
+  latitude?: number;
+  longitude?: number;
 };
 
 export type MonAnnonce = Omit<Annonce, "producteur"> & { statut: StatutAnnonce };

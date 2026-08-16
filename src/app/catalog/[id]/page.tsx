@@ -15,6 +15,7 @@ import {
 import { getSession, subscribeToAuthChanges } from "@/lib/auth";
 import { categorieColors } from "@/lib/colors";
 import { invalidateMesCommandes, useMesCommandesAcheteur } from "@/lib/commandesStore";
+import AnnonceMap from "@/components/AnnonceMap";
 
 const categorieLabels: Record<AnnonceDetail["categorie"], string> = {
   FRUITIER: "Fruitier",
@@ -364,6 +365,19 @@ export default function AnnonceDetailPage() {
             <p className="font-[family-name:var(--font-work-sans)] text-xs text-[#7c8a80]">
               Signalement envoye, merci.
             </p>
+          )}
+
+          {annonce.latitude != null && annonce.longitude != null && (
+            <div className="flex flex-col gap-2">
+              <h2 className="font-sans text-base font-semibold text-[#171c19]">
+                Localisation
+              </h2>
+              <AnnonceMap
+                latitude={annonce.latitude}
+                longitude={annonce.longitude}
+                label={`${annonce.espece} · ${annonce.producteur.nom}`}
+              />
+            </div>
           )}
         </div>
       </div>
