@@ -13,6 +13,7 @@ import {
   type StatutAnnonce,
 } from "@/lib/api";
 import { getSession, subscribeToAuthChanges } from "@/lib/auth";
+import { categorieColors } from "@/lib/colors";
 
 const categories: { value: Categorie; label: string }[] = [
   { value: "FRUITIER", label: "Fruitier" },
@@ -20,6 +21,13 @@ const categories: { value: Categorie; label: string }[] = [
   { value: "MARAICHER", label: "Maraicher" },
   { value: "ORNEMENTAL", label: "Ornemental" },
 ];
+
+const categorieLabels: Record<Categorie, string> = {
+  FRUITIER: "Fruitier",
+  FORESTIER: "Forestier",
+  MARAICHER: "Maraicher",
+  ORNEMENTAL: "Ornemental",
+};
 
 const statutLabels: Record<StatutAnnonce, string> = {
   DISPONIBLE: "Disponible",
@@ -288,13 +296,20 @@ export default function DashboardPage() {
           {annonces.map((annonce) => (
             <div
               key={annonce.id}
-              className="flex flex-col gap-3 rounded-xl border border-[#dfe3e0] bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
+              className={`flex flex-col gap-3 overflow-hidden rounded-xl border-l-4 border-[#dfe3e0] bg-white p-4 sm:flex-row sm:items-center sm:justify-between ${categorieColors[annonce.categorie].ring.replace("border-", "border-l-")}`}
             >
-              <div className="flex flex-col gap-1">
-                <p className="font-sans text-base font-semibold text-[#171c19]">
-                  {annonce.espece}
-                  {annonce.variete ? ` · ${annonce.variete}` : ""}
-                </p>
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center gap-2">
+                  <p className="font-sans text-base font-semibold text-[#171c19]">
+                    {annonce.espece}
+                    {annonce.variete ? ` · ${annonce.variete}` : ""}
+                  </p>
+                  <span
+                    className={`whitespace-nowrap rounded-full border px-2 py-0.5 font-mono text-xs ${categorieColors[annonce.categorie].bg} ${categorieColors[annonce.categorie].text} ${categorieColors[annonce.categorie].ring}`}
+                  >
+                    {categorieLabels[annonce.categorie]}
+                  </span>
+                </div>
                 <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
                   {annonce.quantite} en stock · {annonce.prixUnitaire.toLocaleString("fr-FR")} FCFA/unite
                 </p>

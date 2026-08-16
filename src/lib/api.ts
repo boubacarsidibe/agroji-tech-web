@@ -535,3 +535,54 @@ export async function searchAnnonces(
 
   return res.json();
 }
+
+export type RechercheSauvegardee = {
+  id: string;
+  nom: string;
+  criteres: SearchAnnoncesParams;
+  createdAt: string;
+};
+
+export async function listRecherches(token: string): Promise<RechercheSauvegardee[]> {
+  const res = await fetch(`${API_URL}/api/recherches`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible de charger vos recherches", res.status);
+  }
+
+  return body as RechercheSauvegardee[];
+}
+
+export async function createRecherche(
+  token: string,
+  data: { nom: string; criteres: SearchAnnoncesParams }
+): Promise<RechercheSauvegardee> {
+  const res = await fetch(`${API_URL}/api/recherches`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible d'enregistrer la recherche", res.status);
+  }
+
+  return body as RechercheSauvegardee;
+}
+
+export async function deleteRecherche(token: string, id: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/recherches/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Suppression impossible", res.status);
+  }
+}

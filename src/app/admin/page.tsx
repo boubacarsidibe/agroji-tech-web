@@ -167,19 +167,44 @@ export default function AdminPage() {
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
-          { label: "Utilisateurs", value: dashboard?.utilisateurs },
-          { label: "Annonces actives", value: dashboard?.annoncesActives },
-          { label: "Transactions", value: dashboard?.transactions },
-          { label: "Signalements ouverts", value: dashboard?.signalementsOuverts },
+          {
+            label: "Utilisateurs",
+            value: dashboard?.utilisateurs,
+            bg: "bg-[#e8f0fe]",
+            text: "text-[#1d4ed8]",
+            bar: "bg-[#3b6fe0]",
+          },
+          {
+            label: "Annonces actives",
+            value: dashboard?.annoncesActives,
+            bg: "bg-[#e3f3ea]",
+            text: "text-[#0f5238]",
+            bar: "bg-[#2d6a4f]",
+          },
+          {
+            label: "Transactions",
+            value: dashboard?.transactions,
+            bg: "bg-[#fdf3e0]",
+            text: "text-[#b45309]",
+            bar: "bg-[#e8973f]",
+          },
+          {
+            label: "Signalements ouverts",
+            value: dashboard?.signalementsOuverts,
+            bg: "bg-[#fdecea]",
+            text: "text-[#c0392b]",
+            bar: "bg-[#e05c48]",
+          },
         ].map((stat) => (
           <div
             key={stat.label}
-            className="flex flex-col gap-1 rounded-xl border border-[#dfe3e0] bg-white p-4"
+            className={`flex flex-col gap-1 overflow-hidden rounded-xl border border-[#dfe3e0] ${stat.bg} p-4`}
           >
-            <span className="font-sans text-2xl font-bold text-[#0f5238]">
+            <div className={`-mx-4 -mt-4 mb-1 h-1.5 w-[calc(100%+2rem)] ${stat.bar}`} />
+            <span className={`font-sans text-3xl font-bold ${stat.text}`}>
               {stat.value ?? "—"}
             </span>
-            <span className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+            <span className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
               {stat.label}
             </span>
           </div>

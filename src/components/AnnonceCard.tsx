@@ -4,6 +4,7 @@ import { useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { createCommande, createSignalement, ApiError, type Annonce } from "@/lib/api";
 import { getSession, subscribeToAuthChanges } from "@/lib/auth";
+import { categorieColors } from "@/lib/colors";
 
 const categorieLabels: Record<Annonce["categorie"], string> = {
   FRUITIER: "Fruitier",
@@ -81,6 +82,7 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
 
   return (
     <div className="flex flex-col overflow-hidden rounded-xl border border-[#dfe3e0] bg-white shadow-sm transition hover:shadow-md">
+      <div className={`h-1.5 w-full ${categorieColors[annonce.categorie].bar}`} />
       <div className="relative aspect-[4/3] w-full bg-[#eef3ef]">
         {photo ? (
           // eslint-disable-next-line @next/next/no-img-element -- photo host is user-provided, unknown at build time
@@ -105,7 +107,9 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
               <span className="font-normal text-[#7c8a80]"> · {annonce.variete}</span>
             ) : null}
           </h3>
-          <span className="whitespace-nowrap rounded-full bg-[#eef3ef] px-2 py-1 font-mono text-xs text-[#0f5238]">
+          <span
+            className={`whitespace-nowrap rounded-full border px-2 py-1 font-mono text-xs ${categorieColors[annonce.categorie].bg} ${categorieColors[annonce.categorie].text} ${categorieColors[annonce.categorie].ring}`}
+          >
             {categorieLabels[annonce.categorie]}
           </span>
         </div>

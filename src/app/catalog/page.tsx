@@ -1,9 +1,20 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useSyncExternalStore } from "react";
 import { useSearchParams } from "next/navigation";
 import AnnonceCard from "@/components/AnnonceCard";
-import { searchAnnonces, type Annonce, type Categorie } from "@/lib/api";
+import {
+  createRecherche,
+  deleteRecherche,
+  listRecherches,
+  searchAnnonces,
+  ApiError,
+  type Annonce,
+  type Categorie,
+  type RechercheSauvegardee,
+  type SearchAnnoncesParams,
+} from "@/lib/api";
+import { getSession, subscribeToAuthChanges } from "@/lib/auth";
 
 const categories: { value: Categorie | ""; label: string }[] = [
   { value: "", label: "Toutes categories" },
@@ -29,15 +40,72 @@ export default function CatalogPage() {
 
 function CatalogView() {
   const searchParams = useSearchParams();
+  const session = useSyncExternalStore(subscribeToAuthChanges, getSession, () => null);
   const [q, setQ] = useState("");
   const [categorie, setCategorie] = useState<Categorie | "">("");
   const [region, setRegion] = useState(searchParams.get("region") ?? "");
-  const [tri, setTri] = useState<(typeof sortOptions)[number]["value"]>("pertinence");
+  const [tri, setTri] = useState<NonNullable<SearchAnnoncesParams["tri"]>>("pertinence");
 
   const [annonces, setAnnonces] = useState<Annonce[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [recherches, setRecherches] = useState<RechercheSauvegardee[]>([]);
+  const [showRecherches, setShowRecherches] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    if (!session) return;
+    listRecherches(session.token)
+      .then(setRecherches)
+      .catch(() => {});
+  }, [session]);
+
+  async function handleSaveRecherche() {
+    if (!session) return;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const nom = [q, categorie, region].filter(Boolean).join(" · ") || "Recherche sans nom";
+      const created = await createRecherche(session.token, {
+        nom,
+        criteres: {
+          q: q || undefined,
+          categorie: categorie || undefined,
+          region: region || undefined,
+          tri,
+        },
+      });
+      setRecherches((prev) => [created, ...prev]);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      setSaveError(err instanceof ApiError ? err.message : "Impossible d'enregistrer la recherche.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDeleteRecherche(id: string) {
+    if (!session) return;
+    try {
+      await deleteRecherche(session.token, id);
+      setRecherches((prev) => prev.filter((r) => r.id !== id));
+    } catch {
+      // ignore
+    }
+  }
+
+  function handleApplyRecherche(recherche: RechercheSauvegardee) {
+    setQ(recherche.criteres.q ?? "");
+    setCategorie(recherche.criteres.categorie ?? "");
+    setRegion(recherche.criteres.region ?? "");
+    setTri(recherche.criteres.tri ?? "pertinence");
+    setShowRecherches(false);
+  }
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -107,7 +175,66 @@ function CatalogView() {
             </option>
           ))}
         </select>
+
+        {session && (
+          <div className="relative flex items-center gap-2">
+            <button
+              type="button"
+              disabled={saving}
+              onClick={handleSaveRecherche}
+              className="whitespace-nowrap rounded-lg border border-[#0f5238] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#0f5238] hover:bg-[#0f5238]/5 disabled:opacity-60"
+            >
+              {saved ? "Enregistree ✓" : saving ? "Enregistrement..." : "Sauvegarder cette recherche"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowRecherches((v) => !v)}
+              className="whitespace-nowrap rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-black/5"
+            >
+              Mes recherches ({recherches.length})
+            </button>
+
+            {showRecherches && (
+              <div className="absolute right-0 top-12 z-10 flex w-72 flex-col overflow-hidden rounded-xl border border-[#dfe3e0] bg-white shadow-lg">
+                {recherches.length === 0 ? (
+                  <p className="px-4 py-6 text-center font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+                    Aucune recherche enregistree.
+                  </p>
+                ) : (
+                  recherches.map((r) => (
+                    <div
+                      key={r.id}
+                      className="flex items-center justify-between gap-2 border-b border-[#eef3ef] px-4 py-3 last:border-b-0 hover:bg-[#eef3ef]/60"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => handleApplyRecherche(r)}
+                        className="flex-1 truncate text-left font-[family-name:var(--font-work-sans)] text-sm text-[#171c19]"
+                      >
+                        {r.nom}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteRecherche(r.id)}
+                        aria-label="Supprimer"
+                        className="whitespace-nowrap font-[family-name:var(--font-work-sans)] text-xs text-[#7a1f14] hover:underline"
+                      >
+                        Supprimer
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
+      {saveError && (
+        <p className="rounded-lg bg-[#fdecea] px-4 py-3 font-[family-name:var(--font-work-sans)] text-sm text-[#7a1f14]">
+          {saveError}
+        </p>
+      )}
 
       {error && (
         <p className="rounded-lg bg-[#fdecea] px-4 py-3 font-[family-name:var(--font-work-sans)] text-sm text-[#7a1f14]">
