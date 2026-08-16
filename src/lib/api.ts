@@ -76,6 +76,52 @@ export async function login(telephone: string, motDePasse: string): Promise<Logi
   return body as LoginResult;
 }
 
+export type RegisterInput = {
+  nom: string;
+  telephone: string;
+  email?: string;
+  motDePasse: string;
+  roles: ("PRODUCTEUR" | "ACHETEUR")[];
+  ville?: string;
+  region?: string;
+  description?: string;
+};
+
+export type RegisterResult = {
+  message: string;
+  utilisateur: Pick<Utilisateur, "id" | "nom" | "telephone"> & { email?: string | null; roles: Utilisateur["roles"] };
+};
+
+export async function register(data: RegisterInput): Promise<RegisterResult> {
+  const res = await fetch(`${API_URL}/api/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Inscription impossible", res.status);
+  }
+
+  return body as RegisterResult;
+}
+
+export async function verifyAccount(telephone: string, code: string): Promise<LoginResult> {
+  const res = await fetch(`${API_URL}/api/auth/verify`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ telephone, code }),
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Verification impossible", res.status);
+  }
+
+  return body as LoginResult;
+}
+
 export async function searchAnnonces(
   params: SearchAnnoncesParams
 ): Promise<SearchAnnoncesResult> {
