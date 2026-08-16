@@ -7,6 +7,7 @@ import { createCommande, createSignalement, ApiError, type Annonce } from "@/lib
 import { getSession, subscribeToAuthChanges } from "@/lib/auth";
 import { categorieColors } from "@/lib/colors";
 import { invalidateMesCommandes, useMesCommandesAcheteur } from "@/lib/commandesStore";
+import { toggleFavori, useFavoris } from "@/lib/favorisStore";
 
 const categorieLabels: Record<Annonce["categorie"], string> = {
   FRUITIER: "Fruitier",
@@ -28,6 +29,8 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
   const photo = annonce.photos[0];
   const { commandes: mesCommandes } = useMesCommandesAcheteur(session);
   const commandeExistante = mesCommandes.find((c) => c.annonceId === annonce.id);
+  const { isFavori } = useFavoris(session);
+  const [togglingFavori, setTogglingFavori] = useState(false);
 
   const [ordering, setOrdering] = useState(false);
   const [quantite, setQuantite] = useState(1);
@@ -67,6 +70,21 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
     }
   }
 
+  async function handleToggleFavori() {
+    if (!session) {
+      router.push("/login");
+      return;
+    }
+    setTogglingFavori(true);
+    try {
+      await toggleFavori(session, annonce);
+    } catch {
+      // l'etat optimiste reste affiche; une nouvelle tentative resynchronisera au prochain chargement
+    } finally {
+      setTogglingFavori(false);
+    }
+  }
+
   function handleReportClick() {
     if (!session) {
       router.push("/login");
@@ -95,21 +113,36 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
   return (
     <div className="flex flex-col overflow-hidden rounded-xl border border-[#dfe3e0] bg-white shadow-sm transition hover:shadow-md">
       <div className={`h-1.5 w-full ${categorieColors[annonce.categorie].bar}`} />
-      <Link href={`/catalog/${annonce.id}`} className="relative aspect-[4/3] w-full bg-[#eef3ef]">
-        {photo ? (
-          // eslint-disable-next-line @next/next/no-img-element -- photo host is user-provided, unknown at build time
-          <img src={photo} alt={annonce.espece} className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-sm text-[#7c8a80]">
-            Pas de photo
-          </div>
-        )}
-        {annonce.miseEnAvant && (
-          <span className="absolute left-3 top-3 rounded-full bg-[#0f5238] px-3 py-1 font-mono text-xs font-medium text-white">
-            En avant
+      <div className="relative">
+        <Link href={`/catalog/${annonce.id}`} className="relative block aspect-[4/3] w-full bg-[#eef3ef]">
+          {photo ? (
+            // eslint-disable-next-line @next/next/no-img-element -- photo host is user-provided, unknown at build time
+            <img src={photo} alt={annonce.espece} className="h-full w-full object-cover" />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-sm text-[#7c8a80]">
+              Pas de photo
+            </div>
+          )}
+          {annonce.miseEnAvant && (
+            <span className="absolute left-3 top-3 rounded-full bg-[#0f5238] px-3 py-1 font-mono text-xs font-medium text-white">
+              En avant
+            </span>
+          )}
+        </Link>
+
+        <button
+          type="button"
+          onClick={handleToggleFavori}
+          disabled={togglingFavori}
+          aria-label={isFavori(annonce.id) ? "Retirer des favoris" : "Ajouter aux favoris"}
+          aria-pressed={isFavori(annonce.id)}
+          className="absolute right-3 top-3 flex size-9 items-center justify-center rounded-full bg-white/90 text-lg shadow-sm backdrop-blur-sm transition hover:bg-white disabled:opacity-60"
+        >
+          <span className={isFavori(annonce.id) ? "text-[#c0392b]" : "text-[#bfc9c1]"}>
+            {isFavori(annonce.id) ? "♥" : "♡"}
           </span>
-        )}
-      </Link>
+        </button>
+      </div>
 
       <div className="flex flex-1 flex-col gap-2 p-4">
         <div className="flex items-start justify-between gap-2">

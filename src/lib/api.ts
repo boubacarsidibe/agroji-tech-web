@@ -352,6 +352,45 @@ export type AnnonceInput = {
 
 export type MonAnnonce = Omit<Annonce, "producteur"> & { statut: StatutAnnonce };
 
+export async function listFavoris(token: string): Promise<Annonce[]> {
+  const res = await fetch(`${API_URL}/api/favoris`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible de charger vos favoris", res.status);
+  }
+
+  return body as Annonce[];
+}
+
+export async function addFavori(token: string, annonceId: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/favoris`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ annonceId }),
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible d'ajouter aux favoris", res.status);
+  }
+}
+
+export async function removeFavori(token: string, annonceId: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/favoris/${annonceId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible de retirer des favoris", res.status);
+  }
+}
+
 export async function uploadPhoto(token: string, file: File): Promise<string> {
   const formData = new FormData();
   formData.append("photo", file);

@@ -68,6 +68,12 @@ export default function Header() {
           <div className="hidden items-center gap-3 md:flex">
             {session ? (
               <div className="flex items-center gap-3">
+                <Link
+                  href="/favorites"
+                  className="whitespace-nowrap font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:text-[#0f5238]"
+                >
+                  Favoris
+                </Link>
                 {isProducteur && (
                   <Link
                     href="/dashboard"
@@ -157,6 +163,13 @@ export default function Header() {
 
           {session ? (
             <>
+              <Link
+                href="/favorites"
+                onClick={handleNavClick}
+                className="rounded-lg px-3 py-2.5 font-[family-name:var(--font-work-sans)] text-base text-[#404943] hover:bg-black/5"
+              >
+                Favoris
+              </Link>
               {isProducteur && (
                 <Link
                   href="/dashboard"

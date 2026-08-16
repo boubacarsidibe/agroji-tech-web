@@ -15,6 +15,7 @@ import {
 import { getSession, subscribeToAuthChanges } from "@/lib/auth";
 import { categorieColors } from "@/lib/colors";
 import { invalidateMesCommandes, useMesCommandesAcheteur } from "@/lib/commandesStore";
+import { toggleFavori, useFavoris } from "@/lib/favorisStore";
 import AnnonceMap from "@/components/AnnonceMap";
 
 const categorieLabels: Record<AnnonceDetail["categorie"], string> = {
@@ -43,6 +44,8 @@ export default function AnnonceDetailPage() {
   const router = useRouter();
   const session = useSyncExternalStore(subscribeToAuthChanges, getSession, () => null);
   const { commandes: mesCommandes } = useMesCommandesAcheteur(session);
+  const { isFavori } = useFavoris(session);
+  const [togglingFavori, setTogglingFavori] = useState(false);
 
   const [annonce, setAnnonce] = useState<AnnonceDetail | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState(0);
@@ -82,6 +85,21 @@ export default function AnnonceDetailPage() {
 
     return () => clearTimeout(timeout);
   }, [params.id]);
+
+  async function handleToggleFavori() {
+    if (!session || !annonce) {
+      router.push("/login");
+      return;
+    }
+    setTogglingFavori(true);
+    try {
+      await toggleFavori(session, annonce);
+    } catch {
+      // l'etat optimiste reste affiche; une nouvelle tentative resynchronisera au prochain chargement
+    } finally {
+      setTogglingFavori(false);
+    }
+  }
 
   function handleOrderClick() {
     if (!session) {
@@ -210,11 +228,26 @@ export default function AnnonceDetailPage() {
 
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <span
-              className={`w-fit rounded-full border px-3 py-1 font-mono text-xs ${colors.bg} ${colors.text} ${colors.ring}`}
-            >
-              {categorieLabels[annonce.categorie]}
-            </span>
+            <div className="flex items-start justify-between gap-2">
+              <span
+                className={`w-fit rounded-full border px-3 py-1 font-mono text-xs ${colors.bg} ${colors.text} ${colors.ring}`}
+              >
+                {categorieLabels[annonce.categorie]}
+              </span>
+              <button
+                type="button"
+                onClick={handleToggleFavori}
+                disabled={togglingFavori}
+                aria-label={isFavori(annonce.id) ? "Retirer des favoris" : "Ajouter aux favoris"}
+                aria-pressed={isFavori(annonce.id)}
+                className="flex items-center gap-1.5 rounded-full border border-[#dfe3e0] px-3 py-1 font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:bg-black/5 disabled:opacity-60"
+              >
+                <span className={isFavori(annonce.id) ? "text-[#c0392b]" : "text-[#bfc9c1]"}>
+                  {isFavori(annonce.id) ? "♥" : "♡"}
+                </span>
+                {isFavori(annonce.id) ? "Dans vos favoris" : "Ajouter aux favoris"}
+              </button>
+            </div>
             <h1 className="font-sans text-2xl font-bold text-[#171c19]">
               {annonce.espece}
               {annonce.variete ? (
