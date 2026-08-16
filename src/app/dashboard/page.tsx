@@ -63,8 +63,49 @@ export default function DashboardPage() {
   const [prixUnitaire, setPrixUnitaire] = useState(0);
   const [ville, setVille] = useState("");
   const [region, setRegion] = useState("");
+  const [photos, setPhotos] = useState<string[]>([""]);
   const [creating, setCreating] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+
+  const [editingPhotosId, setEditingPhotosId] = useState<string | null>(null);
+  const [editPhotos, setEditPhotos] = useState<string[]>([""]);
+  const [savingPhotos, setSavingPhotos] = useState(false);
+  const [photosError, setPhotosError] = useState<string | null>(null);
+
+  function handlePhotoChange(list: string[], setList: (v: string[]) => void, index: number, value: string) {
+    setList(list.map((p, i) => (i === index ? value : p)));
+  }
+
+  function handleAddPhotoField(list: string[], setList: (v: string[]) => void) {
+    if (list.length < 5) setList([...list, ""]);
+  }
+
+  function handleRemovePhotoField(list: string[], setList: (v: string[]) => void, index: number) {
+    setList(list.filter((_, i) => i !== index));
+  }
+
+  function handleStartEditPhotos(annonce: MonAnnonce) {
+    setEditPhotos(annonce.photos.length > 0 ? annonce.photos : [""]);
+    setPhotosError(null);
+    setEditingPhotosId(annonce.id);
+  }
+
+  async function handleSavePhotos(id: string) {
+    if (!session) return;
+    setSavingPhotos(true);
+    setPhotosError(null);
+    try {
+      const updated = await updateAnnonce(session.token, id, {
+        photos: editPhotos.map((p) => p.trim()).filter(Boolean),
+      });
+      setAnnonces((prev) => prev.map((a) => (a.id === id ? updated : a)));
+      setEditingPhotosId(null);
+    } catch (err) {
+      setPhotosError(err instanceof ApiError ? err.message : "Mise a jour des photos impossible.");
+    } finally {
+      setSavingPhotos(false);
+    }
+  }
 
   useEffect(() => {
     if (session === null) return;
@@ -101,6 +142,7 @@ export default function DashboardPage() {
         prixUnitaire,
         ville: ville || undefined,
         region: region || undefined,
+        photos: photos.map((p) => p.trim()).filter(Boolean),
       });
       setAnnonces((prev) => [created, ...prev]);
       setEspece("");
@@ -109,6 +151,7 @@ export default function DashboardPage() {
       setPrixUnitaire(0);
       setVille("");
       setRegion("");
+      setPhotos([""]);
       setShowForm(false);
     } catch (err) {
       setFormError(err instanceof ApiError ? err.message : "Impossible de creer l'annonce.");
@@ -259,6 +302,39 @@ export default function DashboardPage() {
             />
           </label>
 
+          <div className="flex flex-col gap-1.5">
+            <span className={labelClass}>Photos (URL, optionnel, 5 max)</span>
+            {photos.map((photo, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <input
+                  type="url"
+                  value={photo}
+                  onChange={(e) => handlePhotoChange(photos, setPhotos, i, e.target.value)}
+                  placeholder="https://..."
+                  className={`flex-1 ${inputClass}`}
+                />
+                {photos.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => handleRemovePhotoField(photos, setPhotos, i)}
+                    className="rounded-lg border border-[#bfc9c1] px-3 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#7a1f14] hover:bg-black/5"
+                  >
+                    Retirer
+                  </button>
+                )}
+              </div>
+            ))}
+            {photos.length < 5 && (
+              <button
+                type="button"
+                onClick={() => handleAddPhotoField(photos, setPhotos)}
+                className="w-fit font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#0f5238] hover:underline"
+              >
+                + Ajouter une photo
+              </button>
+            )}
+          </div>
+
           {formError && (
             <p className="rounded-lg bg-[#fdecea] px-4 py-3 font-[family-name:var(--font-work-sans)] text-sm text-[#7a1f14]">
               {formError}
@@ -296,54 +372,142 @@ export default function DashboardPage() {
           {annonces.map((annonce) => (
             <div
               key={annonce.id}
-              className={`flex flex-col gap-3 overflow-hidden rounded-xl border-l-4 border-[#dfe3e0] bg-white p-4 sm:flex-row sm:items-center sm:justify-between ${categorieColors[annonce.categorie].ring.replace("border-", "border-l-")}`}
+              className={`flex flex-col gap-3 overflow-hidden rounded-xl border-l-4 border-[#dfe3e0] bg-white p-4 ${categorieColors[annonce.categorie].ring.replace("border-", "border-l-")}`}
             >
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center gap-2">
-                  <p className="font-sans text-base font-semibold text-[#171c19]">
-                    {annonce.espece}
-                    {annonce.variete ? ` · ${annonce.variete}` : ""}
-                  </p>
-                  <span
-                    className={`whitespace-nowrap rounded-full border px-2 py-0.5 font-mono text-xs ${categorieColors[annonce.categorie].bg} ${categorieColors[annonce.categorie].text} ${categorieColors[annonce.categorie].ring}`}
-                  >
-                    {categorieLabels[annonce.categorie]}
-                  </span>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3">
+                  {annonce.photos[0] ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- photo host is user-provided, unknown at build time
+                    <img
+                      src={annonce.photos[0]}
+                      alt={annonce.espece}
+                      className="size-14 shrink-0 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-[#eef3ef] text-xs text-[#7c8a80]">
+                      Pas de photo
+                    </div>
+                  )}
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center gap-2">
+                      <p className="font-sans text-base font-semibold text-[#171c19]">
+                        {annonce.espece}
+                        {annonce.variete ? ` · ${annonce.variete}` : ""}
+                      </p>
+                      <span
+                        className={`whitespace-nowrap rounded-full border px-2 py-0.5 font-mono text-xs ${categorieColors[annonce.categorie].bg} ${categorieColors[annonce.categorie].text} ${categorieColors[annonce.categorie].ring}`}
+                      >
+                        {categorieLabels[annonce.categorie]}
+                      </span>
+                    </div>
+                    <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+                      {annonce.quantite} en stock · {annonce.prixUnitaire.toLocaleString("fr-FR")} FCFA/unite
+                    </p>
+                  </div>
                 </div>
-                <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
-                  {annonce.quantite} en stock · {annonce.prixUnitaire.toLocaleString("fr-FR")} FCFA/unite
-                </p>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <span
+                    className={`rounded-full px-3 py-1 font-mono text-xs font-medium ${statutColors[annonce.statut]}`}
+                  >
+                    {statutLabels[annonce.statut]}
+                  </span>
+
+                  <select
+                    value={annonce.statut}
+                    disabled={actionId === annonce.id}
+                    onChange={(e) => handleStatutChange(annonce.id, e.target.value as StatutAnnonce)}
+                    className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238] disabled:opacity-60"
+                  >
+                    {(Object.keys(statutLabels) as StatutAnnonce[]).map((s) => (
+                      <option key={s} value={s}>
+                        {statutLabels[s]}
+                      </option>
+                    ))}
+                  </select>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      editingPhotosId === annonce.id
+                        ? setEditingPhotosId(null)
+                        : handleStartEditPhotos(annonce)
+                    }
+                    className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-black/5"
+                  >
+                    Photos
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={actionId === annonce.id}
+                    onClick={() => handleDelete(annonce.id)}
+                    className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#7a1f14] hover:bg-black/5 disabled:opacity-60"
+                  >
+                    Supprimer
+                  </button>
+                </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <span
-                  className={`rounded-full px-3 py-1 font-mono text-xs font-medium ${statutColors[annonce.statut]}`}
-                >
-                  {statutLabels[annonce.statut]}
-                </span>
-
-                <select
-                  value={annonce.statut}
-                  disabled={actionId === annonce.id}
-                  onChange={(e) => handleStatutChange(annonce.id, e.target.value as StatutAnnonce)}
-                  className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238] disabled:opacity-60"
-                >
-                  {(Object.keys(statutLabels) as StatutAnnonce[]).map((s) => (
-                    <option key={s} value={s}>
-                      {statutLabels[s]}
-                    </option>
+              {editingPhotosId === annonce.id && (
+                <div className="flex flex-col gap-2 rounded-lg border border-[#bfc9c1] p-3">
+                  {editPhotos.map((photo, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <input
+                        type="url"
+                        value={photo}
+                        onChange={(e) =>
+                          handlePhotoChange(editPhotos, setEditPhotos, i, e.target.value)
+                        }
+                        placeholder="https://..."
+                        className={`flex-1 ${inputClass}`}
+                      />
+                      {editPhotos.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemovePhotoField(editPhotos, setEditPhotos, i)}
+                          className="rounded-lg border border-[#bfc9c1] px-3 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#7a1f14] hover:bg-black/5"
+                        >
+                          Retirer
+                        </button>
+                      )}
+                    </div>
                   ))}
-                </select>
+                  {editPhotos.length < 5 && (
+                    <button
+                      type="button"
+                      onClick={() => handleAddPhotoField(editPhotos, setEditPhotos)}
+                      className="w-fit font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#0f5238] hover:underline"
+                    >
+                      + Ajouter une photo
+                    </button>
+                  )}
 
-                <button
-                  type="button"
-                  disabled={actionId === annonce.id}
-                  onClick={() => handleDelete(annonce.id)}
-                  className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#7a1f14] hover:bg-black/5 disabled:opacity-60"
-                >
-                  Supprimer
-                </button>
-              </div>
+                  {photosError && (
+                    <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7a1f14]">
+                      {photosError}
+                    </p>
+                  )}
+
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      disabled={savingPhotos}
+                      onClick={() => handleSavePhotos(annonce.id)}
+                      className="rounded-lg bg-[#0f5238] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#0c4029] disabled:opacity-60"
+                    >
+                      {savingPhotos ? "Enregistrement..." : "Enregistrer"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditingPhotosId(null)}
+                      className="rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:bg-black/5"
+                    >
+                      Annuler
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
