@@ -566,6 +566,42 @@ export async function searchAnnonces(
   return res.json();
 }
 
+export type AnnonceDetail = Annonce & {
+  vues: number;
+  statut: StatutAnnonce;
+  producteur: Annonce["producteur"] & { photoUrl?: string | null; nombreAvis: number };
+};
+
+export async function getAnnonce(id: string): Promise<AnnonceDetail> {
+  const res = await fetch(`${API_URL}/api/annonces/${id}`, { cache: "no-store" });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Annonce introuvable", res.status);
+  }
+
+  return body as AnnonceDetail;
+}
+
+export type EvaluationAvecAuteur = Evaluation & {
+  createdAt: string;
+  auteur: { id: string; nom: string };
+};
+
+export async function listEvaluationsPourUtilisateur(
+  userId: string
+): Promise<EvaluationAvecAuteur[]> {
+  const res = await fetch(`${API_URL}/api/evaluations/utilisateur/${userId}`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error(`Echec du chargement des evaluations (${res.status})`);
+  }
+
+  return res.json();
+}
+
 export type RechercheSauvegardee = {
   id: string;
   nom: string;

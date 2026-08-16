@@ -2,6 +2,7 @@
 
 import { useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createCommande, createSignalement, ApiError, type Annonce } from "@/lib/api";
 import { getSession, subscribeToAuthChanges } from "@/lib/auth";
 import { categorieColors } from "@/lib/colors";
@@ -83,7 +84,7 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
   return (
     <div className="flex flex-col overflow-hidden rounded-xl border border-[#dfe3e0] bg-white shadow-sm transition hover:shadow-md">
       <div className={`h-1.5 w-full ${categorieColors[annonce.categorie].bar}`} />
-      <div className="relative aspect-[4/3] w-full bg-[#eef3ef]">
+      <Link href={`/catalog/${annonce.id}`} className="relative aspect-[4/3] w-full bg-[#eef3ef]">
         {photo ? (
           // eslint-disable-next-line @next/next/no-img-element -- photo host is user-provided, unknown at build time
           <img src={photo} alt={annonce.espece} className="h-full w-full object-cover" />
@@ -97,16 +98,18 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
             En avant
           </span>
         )}
-      </div>
+      </Link>
 
       <div className="flex flex-1 flex-col gap-2 p-4">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-sans text-lg font-semibold text-[#171c19]">
-            {annonce.espece}
-            {annonce.variete ? (
-              <span className="font-normal text-[#7c8a80]"> · {annonce.variete}</span>
-            ) : null}
-          </h3>
+          <Link href={`/catalog/${annonce.id}`}>
+            <h3 className="font-sans text-lg font-semibold text-[#171c19] hover:text-[#0f5238]">
+              {annonce.espece}
+              {annonce.variete ? (
+                <span className="font-normal text-[#7c8a80]"> · {annonce.variete}</span>
+              ) : null}
+            </h3>
+          </Link>
           <span
             className={`whitespace-nowrap rounded-full border px-2 py-1 font-mono text-xs ${categorieColors[annonce.categorie].bg} ${categorieColors[annonce.categorie].text} ${categorieColors[annonce.categorie].ring}`}
           >

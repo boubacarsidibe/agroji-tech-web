@@ -1,14 +1,14 @@
 import Link from "next/link";
 
 const platformLinks = [
-  { label: "Agricultural Advice", href: "/agricultural-advice" },
-  { label: "Contact Us", href: "/contact" },
+  { label: "Conseils agricoles", href: "/agricultural-advice" },
+  { label: "Contact", href: "/contact" },
 ];
 
 const legalLinks = [
-  { label: "Privacy Policy", href: "/privacy-policy" },
-  { label: "Terms of Service", href: "/terms-of-service" },
-  { label: "Legal Mentions", href: "/legal-mentions" },
+  { label: "Confidentialite", href: "/privacy-policy" },
+  { label: "Conditions d'utilisation", href: "/terms-of-service" },
+  { label: "Mentions legales", href: "/legal-mentions" },
 ];
 
 function FooterColumn({
@@ -48,19 +48,19 @@ export default function Footer() {
             AgroJi-Tech
           </p>
           <p className="max-w-[320px] font-mono text-xs font-medium leading-4 text-[#d5d8f9]">
-            Cultivating Digital Empowerment across Senegal&apos;s agricultural
-            landscape.
+            La plateforme qui connecte les pepinieristes et les acheteurs de
+            plants au Senegal.
           </p>
         </div>
 
         <div className="flex flex-col items-start gap-12 sm:flex-row sm:gap-16">
-          <FooterColumn title="Platform" links={platformLinks} />
+          <FooterColumn title="Plateforme" links={platformLinks} />
           <FooterColumn title="Legal" links={legalLinks} />
         </div>
 
         <div className="flex items-end">
           <p className="font-mono text-sm font-medium leading-5 text-[#d5d8f9]">
-            © 2024 AgroJi-Tech Senegal. Cultivating Digital Empowerment.
+            © 2026 AgroJi-Tech Senegal. Tous droits reserves.
           </p>
         </div>
       </div>

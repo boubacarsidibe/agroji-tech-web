@@ -8,9 +8,9 @@ import { clearSession, getSession, subscribeToAuthChanges } from "@/lib/auth";
 import NotificationBell from "@/components/NotificationBell";
 
 const navLinks = [
-  { label: "Catalog", href: "/catalog" },
-  { label: "Producers", href: "/producers" },
-  { label: "Orders", href: "/orders" },
+  { label: "Catalogue", href: "/catalog" },
+  { label: "Producteurs", href: "/producers" },
+  { label: "Commandes", href: "/orders" },
   { label: "Support", href: "/support" },
 ];
 
