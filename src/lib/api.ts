@@ -441,7 +441,7 @@ export type Signalement = {
   statut: StatutSignalement;
   createdAt: string;
   annonce?: Pick<Annonce, "id" | "espece" | "variete"> | null;
-  auteur: { id: string; nom: string };
+  auteur: { id: string; nom: string } | null;
 };
 
 export async function listSignalements(

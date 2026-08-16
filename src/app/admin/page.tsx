@@ -227,7 +227,7 @@ export default function AdminPage() {
                       : "Annonce supprimee"}
                   </p>
                   <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
-                    &laquo;{signalement.raison}&raquo; — par {signalement.auteur.nom}
+                    &laquo;{signalement.raison}&raquo; — par {signalement.auteur?.nom ?? "utilisateur supprime"}
                   </p>
                 </div>
 
