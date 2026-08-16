@@ -32,8 +32,8 @@ export default function ProducersPage() {
   return (
     <div className="mx-auto flex max-w-[1280px] flex-col gap-8 px-6 py-12">
       <div className="flex flex-col gap-2">
-        <h1 className="font-sans text-3xl font-bold text-[#171c19]">Producteurs</h1>
-        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#404943]">
+        <h1 className="font-sans text-3xl font-bold text-[#241a12]">Producteurs</h1>
+        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#4a3f33]">
           Decouvrez les pepinieristes partenaires d&apos;AgroJi-Tech au Senegal.
         </p>
       </div>
@@ -44,14 +44,14 @@ export default function ProducersPage() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Rechercher un producteur..."
-          className="min-w-[240px] flex-1 rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+          className="min-w-[240px] flex-1 rounded-lg border border-[#d9c7a3] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b]"
         />
         <input
           type="text"
           value={region}
           onChange={(e) => setRegion(e.target.value)}
           placeholder="Region"
-          className="w-[160px] rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+          className="w-[160px] rounded-lg border border-[#d9c7a3] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b]"
         />
       </div>
 
@@ -62,7 +62,7 @@ export default function ProducersPage() {
       )}
 
       {!error && !loading && (
-        <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+        <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
           {total} producteur{total > 1 ? "s" : ""} trouve{total > 1 ? "s" : ""}
         </p>
       )}
@@ -70,11 +70,11 @@ export default function ProducersPage() {
       {loading ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-[220px] animate-pulse rounded-xl bg-[#eef3ef]" />
+            <div key={i} className="h-[220px] animate-pulse rounded-xl bg-[#ebdfc3]" />
           ))}
         </div>
       ) : producteurs.length === 0 && !error ? (
-        <p className="py-16 text-center font-[family-name:var(--font-work-sans)] text-base text-[#7c8a80]">
+        <p className="py-16 text-center font-[family-name:var(--font-work-sans)] text-base text-[#8a7960]">
           Aucun producteur ne correspond a votre recherche.
         </p>
       ) : (
@@ -82,7 +82,7 @@ export default function ProducersPage() {
           {producteurs.map((producteur) => (
             <div
               key={producteur.id}
-              className="flex flex-col gap-3 rounded-xl border border-[#dfe3e0] bg-white p-5 shadow-sm transition hover:shadow-md"
+              className="flex flex-col gap-3 rounded-xl border border-[#e4d3ae] bg-white p-5 shadow-sm transition hover:shadow-md"
             >
               <div className="flex items-center gap-3">
                 {producteur.photoUrl ? (
@@ -93,16 +93,16 @@ export default function ProducersPage() {
                     className="size-12 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="flex size-12 items-center justify-center rounded-full bg-[#eef3ef] font-sans text-lg font-semibold text-[#0f5238]">
+                  <div className="flex size-12 items-center justify-center rounded-full bg-[#ebdfc3] font-sans text-lg font-semibold text-[#8f3f1c]">
                     {producteur.nom.charAt(0).toUpperCase()}
                   </div>
                 )}
                 <div className="flex flex-col">
-                  <p className="font-sans text-base font-semibold text-[#171c19]">
+                  <p className="font-sans text-base font-semibold text-[#241a12]">
                     {producteur.nom}
                     {producteur.verifie ? " ✓" : ""}
                   </p>
-                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
                     {[producteur.ville, producteur.region].filter(Boolean).join(", ") ||
                       "Localisation non precisee"}
                   </p>
@@ -110,20 +110,20 @@ export default function ProducersPage() {
               </div>
 
               {producteur.description && (
-                <p className="line-clamp-3 font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
+                <p className="line-clamp-3 font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33]">
                   {producteur.description}
                 </p>
               )}
 
               <div className="mt-auto flex items-center justify-between pt-2">
-                <span className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+                <span className="font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
                   {producteur.nombreAvis > 0
                     ? `${producteur.noteMoyenne.toFixed(1)}★ (${producteur.nombreAvis} avis)`
                     : "Pas encore d'avis"}
                 </span>
                 <Link
                   href={`/producers/${producteur.id}`}
-                  className="font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#0f5238] hover:underline"
+                  className="font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#8f3f1c] hover:underline"
                 >
                   Voir le profil
                 </Link>

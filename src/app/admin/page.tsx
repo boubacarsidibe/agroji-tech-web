@@ -32,8 +32,8 @@ const statutLabels: Record<StatutSignalement, string> = {
 
 const statutColors: Record<StatutSignalement, string> = {
   OUVERT: "bg-[#fdecea] text-[#7a1f14]",
-  TRAITE: "bg-[#e3f3ea] text-[#0f5238]",
-  REJETE: "bg-[#eef3ef] text-[#404943]",
+  TRAITE: "bg-[#e6ecdd] text-[#8f3f1c]",
+  REJETE: "bg-[#ebdfc3] text-[#4a3f33]",
 };
 
 const annonceStatutLabels: Record<StatutAnnonce, string> = {
@@ -43,9 +43,9 @@ const annonceStatutLabels: Record<StatutAnnonce, string> = {
 };
 
 const annonceStatutColors: Record<StatutAnnonce, string> = {
-  DISPONIBLE: "bg-[#e3f3ea] text-[#0f5238]",
+  DISPONIBLE: "bg-[#e6ecdd] text-[#8f3f1c]",
   RUPTURE: "bg-[#fdecea] text-[#7a1f14]",
-  ARCHIVEE: "bg-[#eef3ef] text-[#404943]",
+  ARCHIVEE: "bg-[#ebdfc3] text-[#4a3f33]",
 };
 
 export default function AdminPage() {
@@ -206,7 +206,7 @@ export default function AdminPage() {
   if (!session || !isAdmin) {
     return (
       <div className="flex flex-1 items-center justify-center px-6 py-24">
-        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#404943]">
+        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#4a3f33]">
           Redirection...
         </p>
       </div>
@@ -216,8 +216,8 @@ export default function AdminPage() {
   return (
     <div className="mx-auto flex max-w-[1000px] flex-col gap-8 px-6 py-12">
       <div className="flex flex-col gap-2">
-        <h1 className="font-sans text-3xl font-bold text-[#171c19]">Administration</h1>
-        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#404943]">
+        <h1 className="font-sans text-3xl font-bold text-[#241a12]">Administration</h1>
+        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#4a3f33]">
           Tableau de bord et moderation de la plateforme.
         </p>
       </div>
@@ -240,8 +240,8 @@ export default function AdminPage() {
           {
             label: "Annonces actives",
             value: dashboard?.annoncesActives,
-            bg: "bg-[#e3f3ea]",
-            text: "text-[#0f5238]",
+            bg: "bg-[#e6ecdd]",
+            text: "text-[#8f3f1c]",
             bar: "bg-[#2d6a4f]",
           },
           {
@@ -261,13 +261,13 @@ export default function AdminPage() {
         ].map((stat) => (
           <div
             key={stat.label}
-            className={`flex flex-col gap-1 overflow-hidden rounded-xl border border-[#dfe3e0] ${stat.bg} p-4`}
+            className={`flex flex-col gap-1 overflow-hidden rounded-xl border border-[#e4d3ae] ${stat.bg} p-4`}
           >
             <div className={`-mx-4 -mt-4 mb-1 h-1.5 w-[calc(100%+2rem)] ${stat.bar}`} />
             <span className={`font-sans text-3xl font-bold ${stat.text}`}>
               {stat.value ?? "—"}
             </span>
-            <span className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
+            <span className="font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33]">
               {stat.label}
             </span>
           </div>
@@ -276,13 +276,13 @@ export default function AdminPage() {
 
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-sans text-xl font-semibold text-[#171c19]">
+          <h2 className="font-sans text-xl font-semibold text-[#241a12]">
             Annonces ({annonces.length})
           </h2>
           <select
             value={annonceStatutFiltre}
             onChange={(e) => setAnnonceStatutFiltre(e.target.value as StatutAnnonce | "")}
-            className="rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+            className="rounded-lg border border-[#d9c7a3] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b]"
           >
             <option value="">Tous les statuts</option>
             <option value="DISPONIBLE">Disponible</option>
@@ -294,11 +294,11 @@ export default function AdminPage() {
         {annoncesLoading ? (
           <div className="flex flex-col gap-3">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-20 animate-pulse rounded-xl bg-[#eef3ef]" />
+              <div key={i} className="h-20 animate-pulse rounded-xl bg-[#ebdfc3]" />
             ))}
           </div>
         ) : annonces.length === 0 ? (
-          <p className="py-16 text-center font-[family-name:var(--font-work-sans)] text-base text-[#7c8a80]">
+          <p className="py-16 text-center font-[family-name:var(--font-work-sans)] text-base text-[#8a7960]">
             Aucune annonce ne correspond a ce filtre.
           </p>
         ) : (
@@ -306,11 +306,11 @@ export default function AdminPage() {
             {annonces.map((annonce) => (
               <div
                 key={annonce.id}
-                className={`flex flex-col gap-3 overflow-hidden rounded-xl border-l-4 border-[#dfe3e0] bg-white p-4 sm:flex-row sm:items-center sm:justify-between ${categorieColors[annonce.categorie].ring.replace("border-", "border-l-")}`}
+                className={`flex flex-col gap-3 overflow-hidden rounded-xl border-l-4 border-[#e4d3ae] bg-white p-4 sm:flex-row sm:items-center sm:justify-between ${categorieColors[annonce.categorie].ring.replace("border-", "border-l-")}`}
               >
                 <div className="flex flex-col gap-1.5">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-sans text-base font-semibold text-[#171c19]">
+                    <p className="font-sans text-base font-semibold text-[#241a12]">
                       {annonce.espece}
                       {annonce.variete ? ` · ${annonce.variete}` : ""}
                     </p>
@@ -320,11 +320,11 @@ export default function AdminPage() {
                       {annonceStatutLabels[annonce.statut]}
                     </span>
                   </div>
-                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
                     Par {annonce.producteur.nom} ({annonce.producteur.telephone})
                     {annonce.producteur.region ? ` · ${annonce.producteur.region}` : ""}
                   </p>
-                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
+                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33]">
                     {annonce.quantite} en stock · {annonce.prixUnitaire.toLocaleString("fr-FR")} FCFA/unite
                   </p>
                 </div>
@@ -334,7 +334,7 @@ export default function AdminPage() {
                     value={annonce.statut}
                     disabled={annonceActionId === annonce.id}
                     onChange={(e) => handleAnnonceStatutChange(annonce.id, e.target.value as StatutAnnonce)}
-                    className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238] disabled:opacity-60"
+                    className="rounded-lg border border-[#d9c7a3] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b] disabled:opacity-60"
                   >
                     {(Object.keys(annonceStatutLabels) as StatutAnnonce[]).map((s) => (
                       <option key={s} value={s}>
@@ -346,7 +346,7 @@ export default function AdminPage() {
                     type="button"
                     disabled={annonceActionId === annonce.id}
                     onClick={() => handleAnnonceDelete(annonce.id)}
-                    className="whitespace-nowrap rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#7a1f14] hover:bg-black/5 disabled:opacity-60"
+                    className="whitespace-nowrap rounded-lg border border-[#d9c7a3] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#7a1f14] hover:bg-black/5 disabled:opacity-60"
                   >
                     Supprimer
                   </button>
@@ -359,11 +359,11 @@ export default function AdminPage() {
 
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-sans text-xl font-semibold text-[#171c19]">Signalements</h2>
+          <h2 className="font-sans text-xl font-semibold text-[#241a12]">Signalements</h2>
           <select
             value={filtre}
             onChange={(e) => setFiltre(e.target.value as StatutSignalement | "")}
-            className="rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+            className="rounded-lg border border-[#d9c7a3] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b]"
           >
             <option value="">Tous</option>
             <option value="OUVERT">Ouverts</option>
@@ -375,11 +375,11 @@ export default function AdminPage() {
         {loading ? (
           <div className="flex flex-col gap-3">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-20 animate-pulse rounded-xl bg-[#eef3ef]" />
+              <div key={i} className="h-20 animate-pulse rounded-xl bg-[#ebdfc3]" />
             ))}
           </div>
         ) : signalements.length === 0 ? (
-          <p className="py-16 text-center font-[family-name:var(--font-work-sans)] text-base text-[#7c8a80]">
+          <p className="py-16 text-center font-[family-name:var(--font-work-sans)] text-base text-[#8a7960]">
             Aucun signalement.
           </p>
         ) : (
@@ -387,17 +387,17 @@ export default function AdminPage() {
             {signalements.map((signalement) => (
               <div
                 key={signalement.id}
-                className="flex flex-col gap-3 rounded-xl border border-[#dfe3e0] bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-3 rounded-xl border border-[#e4d3ae] bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="flex flex-col gap-1">
-                  <p className="font-sans text-base font-semibold text-[#171c19]">
+                  <p className="font-sans text-base font-semibold text-[#241a12]">
                     {signalement.annonce
                       ? `${signalement.annonce.espece}${
                           signalement.annonce.variete ? ` · ${signalement.annonce.variete}` : ""
                         }`
                       : "Annonce supprimee"}
                   </p>
-                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
+                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33]">
                     &laquo;{signalement.raison}&raquo; — par {signalement.auteur?.nom ?? "utilisateur supprime"}
                   </p>
                 </div>
@@ -416,7 +416,7 @@ export default function AdminPage() {
                           type="button"
                           disabled={actionId === signalement.id}
                           onClick={() => handleArchiver(signalement.id, signalement.annonceId!)}
-                          className="whitespace-nowrap rounded-lg bg-[#0f5238] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#0c4029] disabled:opacity-60"
+                          className="whitespace-nowrap rounded-lg bg-[#b8552b] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#8f3f1c] disabled:opacity-60"
                         >
                           Archiver l&apos;annonce
                         </button>
@@ -425,7 +425,7 @@ export default function AdminPage() {
                         type="button"
                         disabled={actionId === signalement.id}
                         onClick={() => handleTraiter(signalement.id, "TRAITE")}
-                        className="whitespace-nowrap rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-black/5 disabled:opacity-60"
+                        className="whitespace-nowrap rounded-lg border border-[#d9c7a3] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#4a3f33] hover:bg-black/5 disabled:opacity-60"
                       >
                         Marquer traite
                       </button>
@@ -433,7 +433,7 @@ export default function AdminPage() {
                         type="button"
                         disabled={actionId === signalement.id}
                         onClick={() => handleTraiter(signalement.id, "REJETE")}
-                        className="whitespace-nowrap rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#7a1f14] hover:bg-black/5 disabled:opacity-60"
+                        className="whitespace-nowrap rounded-lg border border-[#d9c7a3] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#7a1f14] hover:bg-black/5 disabled:opacity-60"
                       >
                         Rejeter
                       </button>
@@ -448,11 +448,11 @@ export default function AdminPage() {
 
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-sans text-xl font-semibold text-[#171c19]">Utilisateurs</h2>
+          <h2 className="font-sans text-xl font-semibold text-[#241a12]">Utilisateurs</h2>
           <select
             value={roleFiltre}
             onChange={(e) => setRoleFiltre(e.target.value as "" | "PRODUCTEUR" | "ACHETEUR")}
-            className="rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+            className="rounded-lg border border-[#d9c7a3] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b]"
           >
             <option value="">Tous les roles</option>
             <option value="PRODUCTEUR">Producteurs</option>
@@ -463,11 +463,11 @@ export default function AdminPage() {
         {usersLoading ? (
           <div className="flex flex-col gap-3">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-16 animate-pulse rounded-xl bg-[#eef3ef]" />
+              <div key={i} className="h-16 animate-pulse rounded-xl bg-[#ebdfc3]" />
             ))}
           </div>
         ) : utilisateurs.length === 0 ? (
-          <p className="py-16 text-center font-[family-name:var(--font-work-sans)] text-base text-[#7c8a80]">
+          <p className="py-16 text-center font-[family-name:var(--font-work-sans)] text-base text-[#8a7960]">
             Aucun utilisateur actif ne correspond a ce filtre.
           </p>
         ) : (
@@ -475,14 +475,14 @@ export default function AdminPage() {
             {utilisateurs.map((utilisateur) => (
               <div
                 key={utilisateur.id}
-                className="flex flex-col gap-3 rounded-xl border border-[#dfe3e0] bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-3 rounded-xl border border-[#e4d3ae] bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="flex flex-col gap-1">
-                  <p className="font-sans text-base font-semibold text-[#171c19]">
+                  <p className="font-sans text-base font-semibold text-[#241a12]">
                     {utilisateur.nom}
                     {utilisateur.verifie ? " ✓" : ""}
                   </p>
-                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
                     {utilisateur.roles.join(", ")}
                     {utilisateur.region ? ` · ${utilisateur.region}` : ""}
                   </p>
@@ -494,7 +494,7 @@ export default function AdminPage() {
                       type="button"
                       disabled={userActionId === utilisateur.id}
                       onClick={() => handleVerifier(utilisateur.id)}
-                      className="whitespace-nowrap rounded-lg bg-[#0f5238] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#0c4029] disabled:opacity-60"
+                      className="whitespace-nowrap rounded-lg bg-[#b8552b] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#8f3f1c] disabled:opacity-60"
                     >
                       Verifier
                     </button>
@@ -503,7 +503,7 @@ export default function AdminPage() {
                     type="button"
                     disabled={userActionId === utilisateur.id}
                     onClick={() => handleSuspendre(utilisateur.id)}
-                    className="whitespace-nowrap rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#7a1f14] hover:bg-black/5 disabled:opacity-60"
+                    className="whitespace-nowrap rounded-lg border border-[#d9c7a3] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#7a1f14] hover:bg-black/5 disabled:opacity-60"
                   >
                     Suspendre
                   </button>

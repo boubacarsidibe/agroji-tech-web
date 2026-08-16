@@ -93,19 +93,19 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
   }
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-xl border border-[#dfe3e0] bg-white shadow-sm transition hover:shadow-md">
+    <div className="flex flex-col overflow-hidden rounded-xl border border-[#e4d3ae] bg-white shadow-sm transition hover:shadow-md">
       <div className={`h-1.5 w-full ${categorieColors[annonce.categorie].bar}`} />
-      <Link href={`/catalog/${annonce.id}`} className="relative aspect-[4/3] w-full bg-[#eef3ef]">
+      <Link href={`/catalog/${annonce.id}`} className="relative aspect-[4/3] w-full bg-[#ebdfc3]">
         {photo ? (
           // eslint-disable-next-line @next/next/no-img-element -- photo host is user-provided, unknown at build time
           <img src={photo} alt={annonce.espece} className="h-full w-full object-cover" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-sm text-[#7c8a80]">
+          <div className="flex h-full w-full items-center justify-center text-sm text-[#8a7960]">
             Pas de photo
           </div>
         )}
         {annonce.miseEnAvant && (
-          <span className="absolute left-3 top-3 rounded-full bg-[#0f5238] px-3 py-1 font-mono text-xs font-medium text-white">
+          <span className="absolute left-3 top-3 rounded-full bg-[#b8552b] px-3 py-1 font-mono text-xs font-medium text-white">
             En avant
           </span>
         )}
@@ -114,10 +114,10 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
       <div className="flex flex-1 flex-col gap-2 p-4">
         <div className="flex items-start justify-between gap-2">
           <Link href={`/catalog/${annonce.id}`}>
-            <h3 className="font-sans text-lg font-semibold text-[#171c19] hover:text-[#0f5238]">
+            <h3 className="font-sans text-lg font-semibold text-[#241a12] hover:text-[#8f3f1c]">
               {annonce.espece}
               {annonce.variete ? (
-                <span className="font-normal text-[#7c8a80]"> · {annonce.variete}</span>
+                <span className="font-normal text-[#8a7960]"> · {annonce.variete}</span>
               ) : null}
             </h3>
           </Link>
@@ -128,21 +128,21 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
           </span>
         </div>
 
-        <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
+        <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33]">
           {[annonce.ville, annonce.region].filter(Boolean).join(", ") || "Localisation non precisee"}
         </p>
 
         <div className="mt-auto flex items-center justify-between pt-2">
-          <span className="font-sans text-xl font-bold text-[#0f5238]">
+          <span className="font-sans text-xl font-bold text-[#8f3f1c]">
             {annonce.prixUnitaire.toLocaleString("fr-FR")} FCFA
           </span>
-          <span className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+          <span className="font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
             {annonce.quantite} en stock
           </span>
         </div>
 
         <div className="flex items-center justify-between gap-2">
-          <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
+          <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33]">
             {annonce.producteur.nom}
             {annonce.producteur.verifie ? " ✓" : ""}
             {annonce.producteur.noteMoyenne != null
@@ -153,7 +153,7 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
             <button
               type="button"
               onClick={handleReportClick}
-              className="whitespace-nowrap font-[family-name:var(--font-work-sans)] text-xs text-[#7c8a80] hover:text-[#7a1f14] hover:underline"
+              className="whitespace-nowrap font-[family-name:var(--font-work-sans)] text-xs text-[#8a7960] hover:text-[#7a1f14] hover:underline"
             >
               Signaler
             </button>
@@ -161,13 +161,13 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
         </div>
 
         {reporting && (
-          <div className="flex flex-col gap-2 rounded-lg border border-[#bfc9c1] p-2">
+          <div className="flex flex-col gap-2 rounded-lg border border-[#d9c7a3] p-2">
             <textarea
               value={raison}
               onChange={(e) => setRaison(e.target.value)}
               placeholder="Motif du signalement..."
               rows={2}
-              className="rounded-lg border border-[#bfc9c1] px-2 py-1.5 font-[family-name:var(--font-work-sans)] text-xs text-[#171c19] outline-none focus:border-[#0f5238]"
+              className="rounded-lg border border-[#d9c7a3] px-2 py-1.5 font-[family-name:var(--font-work-sans)] text-xs text-[#241a12] outline-none focus:border-[#b8552b]"
             />
             {reportError && (
               <p className="font-[family-name:var(--font-work-sans)] text-xs text-[#7a1f14]">
@@ -179,14 +179,14 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
                 type="button"
                 disabled={reportLoading || !raison.trim()}
                 onClick={handleReportConfirm}
-                className="flex-1 rounded-lg bg-[#0f5238] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-xs font-medium text-white hover:bg-[#0c4029] disabled:opacity-60"
+                className="flex-1 rounded-lg bg-[#b8552b] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-xs font-medium text-white hover:bg-[#8f3f1c] disabled:opacity-60"
               >
                 {reportLoading ? "Envoi..." : "Envoyer"}
               </button>
               <button
                 type="button"
                 onClick={() => setReporting(false)}
-                className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-xs text-[#404943] hover:bg-black/5"
+                className="rounded-lg border border-[#d9c7a3] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-xs text-[#4a3f33] hover:bg-black/5"
               >
                 Annuler
               </button>
@@ -195,7 +195,7 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
         )}
 
         {reportSent && (
-          <p className="font-[family-name:var(--font-work-sans)] text-xs text-[#7c8a80]">
+          <p className="font-[family-name:var(--font-work-sans)] text-xs text-[#8a7960]">
             Signalement envoye, merci.
           </p>
         )}
@@ -209,14 +209,14 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
         {commandeExistante && !sent && (
           <Link
             href="/orders"
-            className="rounded-lg bg-[#eef3ef] px-3 py-2 text-center font-[family-name:var(--font-work-sans)] text-xs font-medium text-[#404943] hover:bg-[#e3e9e5]"
+            className="rounded-lg bg-[#ebdfc3] px-3 py-2 text-center font-[family-name:var(--font-work-sans)] text-xs font-medium text-[#4a3f33] hover:bg-[#e3e9e5]"
           >
             Vous avez deja commande ce plant · {commandeStatutLabels[commandeExistante.statut]}
           </Link>
         )}
 
         {sent ? (
-          <p className="rounded-lg bg-[#e3f3ea] px-3 py-2 text-center font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#0f5238]">
+          <p className="rounded-lg bg-[#e6ecdd] px-3 py-2 text-center font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#8f3f1c]">
             Demande envoyee
           </p>
         ) : ordering ? (
@@ -227,20 +227,20 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
               max={annonce.quantite}
               value={quantite}
               onChange={(e) => setQuantite(Number(e.target.value))}
-              className="w-16 rounded-lg border border-[#bfc9c1] px-2 py-1.5 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+              className="w-16 rounded-lg border border-[#d9c7a3] px-2 py-1.5 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b]"
             />
             <button
               type="button"
               disabled={loading}
               onClick={handleConfirm}
-              className="flex-1 rounded-lg bg-[#0f5238] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#0c4029] disabled:opacity-60"
+              className="flex-1 rounded-lg bg-[#b8552b] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#8f3f1c] disabled:opacity-60"
             >
               {loading ? "Envoi..." : "Confirmer"}
             </button>
             <button
               type="button"
               onClick={() => setOrdering(false)}
-              className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:bg-black/5"
+              className="rounded-lg border border-[#d9c7a3] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33] hover:bg-black/5"
             >
               Annuler
             </button>
@@ -249,7 +249,7 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
           <button
             type="button"
             onClick={handleOrderClick}
-            className="rounded-lg bg-[#0f5238] px-3 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#0c4029]"
+            className="rounded-lg bg-[#b8552b] px-3 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#8f3f1c]"
           >
             Commander
           </button>

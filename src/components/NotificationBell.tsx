@@ -97,14 +97,14 @@ export default function NotificationBell({ session }: { session: Session }) {
       </button>
 
       {open && (
-        <div className="fixed inset-x-4 top-16 z-10 flex max-h-[70vh] w-auto flex-col overflow-hidden rounded-xl border border-[#dfe3e0] bg-white shadow-lg sm:absolute sm:inset-x-auto sm:right-0 sm:top-12 sm:w-80">
-          <div className="flex items-center justify-between border-b border-[#dfe3e0] px-4 py-3">
-            <span className="font-sans text-sm font-semibold text-[#171c19]">Notifications</span>
+        <div className="fixed inset-x-4 top-16 z-10 flex max-h-[70vh] w-auto flex-col overflow-hidden rounded-xl border border-[#e4d3ae] bg-white shadow-lg sm:absolute sm:inset-x-auto sm:right-0 sm:top-12 sm:w-80">
+          <div className="flex items-center justify-between border-b border-[#e4d3ae] px-4 py-3">
+            <span className="font-sans text-sm font-semibold text-[#241a12]">Notifications</span>
             {unreadCount > 0 && (
               <button
                 type="button"
                 onClick={handleMarkAllAsRead}
-                className="font-[family-name:var(--font-work-sans)] text-xs font-medium text-[#0f5238] hover:underline"
+                className="font-[family-name:var(--font-work-sans)] text-xs font-medium text-[#8f3f1c] hover:underline"
               >
                 Tout marquer comme lu
               </button>
@@ -113,7 +113,7 @@ export default function NotificationBell({ session }: { session: Session }) {
 
           <div className="max-h-96 overflow-y-auto">
             {notifications.length === 0 ? (
-              <p className="px-4 py-8 text-center font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+              <p className="px-4 py-8 text-center font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
                 Aucune notification.
               </p>
             ) : (
@@ -122,14 +122,14 @@ export default function NotificationBell({ session }: { session: Session }) {
                   key={notification.id}
                   type="button"
                   onClick={() => handleNotificationClick(notification)}
-                  className={`flex w-full flex-col gap-1 border-b border-[#eef3ef] px-4 py-3 text-left last:border-b-0 hover:bg-[#eef3ef]/60 ${
-                    notification.lu ? "" : "bg-[#e3f3ea]/50"
+                  className={`flex w-full flex-col gap-1 border-b border-[#ebdfc3] px-4 py-3 text-left last:border-b-0 hover:bg-[#ebdfc3]/60 ${
+                    notification.lu ? "" : "bg-[#e6ecdd]/50"
                   }`}
                 >
-                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#171c19]">
+                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#241a12]">
                     {notification.contenu}
                   </p>
-                  <span className="font-[family-name:var(--font-work-sans)] text-xs text-[#7c8a80]">
+                  <span className="font-[family-name:var(--font-work-sans)] text-xs text-[#8a7960]">
                     {timeAgo(notification.createdAt)}
                   </span>
                 </button>

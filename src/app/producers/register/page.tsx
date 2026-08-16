@@ -78,15 +78,15 @@ export default function RegisterAsProducerPage() {
   }
 
   const inputClass =
-    "rounded-lg border border-[#bfc9c1] px-4 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]";
-  const labelClass = "font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#171c19]";
+    "rounded-lg border border-[#d9c7a3] px-4 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b]";
+  const labelClass = "font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#241a12]";
 
   if (step === "otp") {
     return (
       <div className="mx-auto flex max-w-[420px] flex-col gap-8 px-6 py-24">
         <div className="flex flex-col gap-2">
-          <h1 className="font-sans text-3xl font-bold text-[#171c19]">Verification</h1>
-          <p className="font-[family-name:var(--font-work-sans)] text-base text-[#404943]">
+          <h1 className="font-sans text-3xl font-bold text-[#241a12]">Verification</h1>
+          <p className="font-[family-name:var(--font-work-sans)] text-base text-[#4a3f33]">
             Un code a 6 chiffres a ete envoye par SMS au {telephone}.
           </p>
         </div>
@@ -115,7 +115,7 @@ export default function RegisterAsProducerPage() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 rounded-lg bg-[#0f5238] px-6 py-3 font-[family-name:var(--font-work-sans)] text-base font-semibold text-white hover:bg-[#0c4029] disabled:opacity-60"
+            className="mt-2 rounded-lg bg-[#b8552b] px-6 py-3 font-[family-name:var(--font-work-sans)] text-base font-semibold text-white hover:bg-[#8f3f1c] disabled:opacity-60"
           >
             {loading ? "Verification..." : "Verifier et continuer"}
           </button>
@@ -127,8 +127,8 @@ export default function RegisterAsProducerPage() {
   return (
     <div className="mx-auto flex max-w-[560px] flex-col gap-8 px-6 py-24">
       <div className="flex flex-col gap-2">
-        <h1 className="font-sans text-3xl font-bold text-[#171c19]">Devenir producteur</h1>
-        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#404943]">
+        <h1 className="font-sans text-3xl font-bold text-[#241a12]">Devenir producteur</h1>
+        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#4a3f33]">
           Rejoignez AgroJi-Tech et publiez vos annonces de plants aupres des acheteurs du Senegal.
         </p>
       </div>
@@ -226,7 +226,7 @@ export default function RegisterAsProducerPage() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-2 rounded-lg bg-[#0f5238] px-6 py-3 font-[family-name:var(--font-work-sans)] text-base font-semibold text-white hover:bg-[#0c4029] disabled:opacity-60"
+          className="mt-2 rounded-lg bg-[#b8552b] px-6 py-3 font-[family-name:var(--font-work-sans)] text-base font-semibold text-white hover:bg-[#8f3f1c] disabled:opacity-60"
         >
           {loading ? "Inscription..." : "S'inscrire comme producteur"}
         </button>

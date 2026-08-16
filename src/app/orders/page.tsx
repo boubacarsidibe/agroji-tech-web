@@ -21,10 +21,10 @@ const statutLabels: Record<StatutCommande, string> = {
 };
 
 const statutColors: Record<StatutCommande, string> = {
-  ENVOYEE: "bg-[#eef3ef] text-[#404943]",
-  ACCEPTEE: "bg-[#e3f3ea] text-[#0f5238]",
+  ENVOYEE: "bg-[#ebdfc3] text-[#4a3f33]",
+  ACCEPTEE: "bg-[#e6ecdd] text-[#8f3f1c]",
   REFUSEE: "bg-[#fdecea] text-[#7a1f14]",
-  FINALISEE: "bg-[#0f5238] text-white",
+  FINALISEE: "bg-[#b8552b] text-white",
 };
 
 function formatDate(iso: string): string {
@@ -105,7 +105,7 @@ export default function OrdersPage() {
   if (!session) {
     return (
       <div className="flex flex-1 items-center justify-center px-6 py-24">
-        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#404943]">
+        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#4a3f33]">
           Redirection vers la connexion...
         </p>
       </div>
@@ -115,21 +115,21 @@ export default function OrdersPage() {
   return (
     <div className="mx-auto flex max-w-[900px] flex-col gap-8 px-6 py-12">
       <div className="flex flex-col gap-2">
-        <h1 className="font-sans text-3xl font-bold text-[#171c19]">Mes commandes</h1>
-        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#404943]">
+        <h1 className="font-sans text-3xl font-bold text-[#241a12]">Mes commandes</h1>
+        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#4a3f33]">
           Suivez vos demandes de plants et leur statut.
         </p>
       </div>
 
       {isProducteur && isAcheteur && (
-        <div className="flex w-fit rounded-lg border border-[#bfc9c1] p-1">
+        <div className="flex w-fit rounded-lg border border-[#d9c7a3] p-1">
           {(["acheteur", "producteur"] as const).map((r) => (
             <button
               key={r}
               type="button"
               onClick={() => setRole(r)}
               className={`rounded-md px-4 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium ${
-                role === r ? "bg-[#0f5238] text-white" : "text-[#404943]"
+                role === r ? "bg-[#b8552b] text-white" : "text-[#4a3f33]"
               }`}
             >
               {r === "acheteur" ? "En tant qu'acheteur" : "En tant que producteur"}
@@ -147,13 +147,13 @@ export default function OrdersPage() {
       {loading ? (
         <div className="flex flex-col gap-3">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-24 animate-pulse rounded-xl bg-[#eef3ef]" />
+            <div key={i} className="h-24 animate-pulse rounded-xl bg-[#ebdfc3]" />
           ))}
         </div>
       ) : commandes.length === 0 ? (
-        <p className="py-16 text-center font-[family-name:var(--font-work-sans)] text-base text-[#7c8a80]">
+        <p className="py-16 text-center font-[family-name:var(--font-work-sans)] text-base text-[#8a7960]">
           Aucune commande pour le moment.{" "}
-          <Link href="/catalog" className="font-medium text-[#0f5238] hover:underline">
+          <Link href="/catalog" className="font-medium text-[#8f3f1c] hover:underline">
             Parcourir le catalogue
           </Link>
         </p>
@@ -162,24 +162,24 @@ export default function OrdersPage() {
           {commandes.map((commande) => (
             <div
               key={commande.id}
-              className="flex flex-col gap-3 rounded-xl border border-[#dfe3e0] bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
+              className="flex flex-col gap-3 rounded-xl border border-[#e4d3ae] bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="flex flex-col gap-1">
                 <Link
                   href={`/catalog/${commande.annonceId}`}
-                  className="font-sans text-base font-semibold text-[#171c19] hover:text-[#0f5238]"
+                  className="font-sans text-base font-semibold text-[#241a12] hover:text-[#8f3f1c]"
                 >
                   {commande.annonce.espece}
                   {commande.annonce.variete ? ` · ${commande.annonce.variete}` : ""}
                 </Link>
-                <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+                <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
                   Quantite: {commande.quantiteDemandee} · {commande.annonce.prixUnitaire.toLocaleString("fr-FR")} FCFA/unite
                 </p>
-                <p className="font-[family-name:var(--font-work-sans)] text-xs text-[#7c8a80]">
+                <p className="font-[family-name:var(--font-work-sans)] text-xs text-[#8a7960]">
                   Commande le {formatDate(commande.createdAt)}
                 </p>
                 {commande.message && (
-                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
+                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33]">
                     &laquo;{commande.message}&raquo;
                   </p>
                 )}
@@ -198,7 +198,7 @@ export default function OrdersPage() {
                       type="button"
                       disabled={actionId === commande.id}
                       onClick={() => handleStatutChange(commande.id, "ACCEPTEE")}
-                      className="rounded-lg bg-[#0f5238] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#0c4029] disabled:opacity-60"
+                      className="rounded-lg bg-[#b8552b] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#8f3f1c] disabled:opacity-60"
                     >
                       Accepter
                     </button>
@@ -206,7 +206,7 @@ export default function OrdersPage() {
                       type="button"
                       disabled={actionId === commande.id}
                       onClick={() => handleStatutChange(commande.id, "REFUSEE")}
-                      className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-black/5 disabled:opacity-60"
+                      className="rounded-lg border border-[#d9c7a3] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#4a3f33] hover:bg-black/5 disabled:opacity-60"
                     >
                       Refuser
                     </button>
@@ -218,7 +218,7 @@ export default function OrdersPage() {
                     type="button"
                     disabled={actionId === commande.id}
                     onClick={() => handleStatutChange(commande.id, "FINALISEE")}
-                    className="rounded-lg bg-[#0f5238] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#0c4029] disabled:opacity-60"
+                    className="rounded-lg bg-[#b8552b] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#8f3f1c] disabled:opacity-60"
                   >
                     Finaliser
                   </button>
@@ -226,7 +226,7 @@ export default function OrdersPage() {
 
                 {role === "acheteur" && commande.statut === "FINALISEE" && (
                   commande.evaluation ? (
-                    <span className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+                    <span className="font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
                       Note envoyee: {commande.evaluation.note}★
                     </span>
                   ) : evaluatingId === commande.id ? (
@@ -234,7 +234,7 @@ export default function OrdersPage() {
                       <select
                         value={note}
                         onChange={(e) => setNote(Number(e.target.value))}
-                        className="rounded-lg border border-[#bfc9c1] px-2 py-1.5 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+                        className="rounded-lg border border-[#d9c7a3] px-2 py-1.5 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b]"
                       >
                         {[5, 4, 3, 2, 1].map((n) => (
                           <option key={n} value={n}>
@@ -246,7 +246,7 @@ export default function OrdersPage() {
                         type="button"
                         disabled={actionId === commande.id}
                         onClick={() => handleEvaluer(commande.id)}
-                        className="rounded-lg bg-[#0f5238] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#0c4029] disabled:opacity-60"
+                        className="rounded-lg bg-[#b8552b] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#8f3f1c] disabled:opacity-60"
                       >
                         Envoyer
                       </button>
@@ -255,7 +255,7 @@ export default function OrdersPage() {
                     <button
                       type="button"
                       onClick={() => setEvaluatingId(commande.id)}
-                      className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-black/5"
+                      className="rounded-lg border border-[#d9c7a3] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#4a3f33] hover:bg-black/5"
                     >
                       Evaluer
                     </button>

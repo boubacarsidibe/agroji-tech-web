@@ -1,17 +1,19 @@
 import type { Metadata } from "next";
-import { Hanken_Grotesk, JetBrains_Mono, Work_Sans } from "next/font/google";
+import { Fraunces, Archivo, Work_Sans } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import "./globals.css";
 
-const hankenGrotesk = Hanken_Grotesk({
+const fraunces = Fraunces({
   variable: "--font-hanken-grotesk",
   subsets: ["latin"],
+  weight: ["600", "700", "900"],
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const archivo = Archivo({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
+  weight: ["600", "700"],
 });
 
 const workSans = Work_Sans({
@@ -28,8 +30,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
-      className={`${hankenGrotesk.variable} ${jetbrainsMono.variable} ${workSans.variable} h-full antialiased`}
+      lang="fr"
+      className={`${fraunces.variable} ${archivo.variable} ${workSans.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <Header />

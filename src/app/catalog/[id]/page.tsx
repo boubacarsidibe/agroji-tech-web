@@ -134,8 +134,8 @@ export default function AnnonceDetailPage() {
   if (loading) {
     return (
       <div className="mx-auto flex max-w-[900px] flex-col gap-6 px-6 py-12">
-        <div className="h-80 animate-pulse rounded-xl bg-[#eef3ef]" />
-        <div className="h-24 animate-pulse rounded-xl bg-[#eef3ef]" />
+        <div className="h-80 animate-pulse rounded-xl bg-[#ebdfc3]" />
+        <div className="h-24 animate-pulse rounded-xl bg-[#ebdfc3]" />
       </div>
     );
   }
@@ -146,7 +146,7 @@ export default function AnnonceDetailPage() {
         <p className="font-[family-name:var(--font-work-sans)] text-base text-[#7a1f14]">
           {error ?? "Annonce introuvable."}
         </p>
-        <Link href="/catalog" className="font-medium text-[#0f5238] hover:underline">
+        <Link href="/catalog" className="font-medium text-[#8f3f1c] hover:underline">
           Retour au catalogue
         </Link>
       </div>
@@ -159,13 +159,13 @@ export default function AnnonceDetailPage() {
     <div className="mx-auto flex max-w-[900px] flex-col gap-8 px-6 py-12">
       <Link
         href="/catalog"
-        className="w-fit font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:text-[#0f5238]"
+        className="w-fit font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33] hover:text-[#8f3f1c]"
       >
         ← Retour au catalogue
       </Link>
 
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-[#eef3ef]">
+        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-[#ebdfc3]">
           {annonce.photos[0] ? (
             // eslint-disable-next-line @next/next/no-img-element -- photo host is user-provided, unknown at build time
             <img
@@ -174,12 +174,12 @@ export default function AnnonceDetailPage() {
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-sm text-[#7c8a80]">
+            <div className="flex h-full w-full items-center justify-center text-sm text-[#8a7960]">
               Pas de photo
             </div>
           )}
           {annonce.miseEnAvant && (
-            <span className="absolute left-3 top-3 rounded-full bg-[#0f5238] px-3 py-1 font-mono text-xs font-medium text-white">
+            <span className="absolute left-3 top-3 rounded-full bg-[#b8552b] px-3 py-1 font-mono text-xs font-medium text-white">
               En avant
             </span>
           )}
@@ -192,38 +192,38 @@ export default function AnnonceDetailPage() {
             >
               {categorieLabels[annonce.categorie]}
             </span>
-            <h1 className="font-sans text-2xl font-bold text-[#171c19]">
+            <h1 className="font-sans text-2xl font-bold text-[#241a12]">
               {annonce.espece}
               {annonce.variete ? (
-                <span className="font-normal text-[#7c8a80]"> · {annonce.variete}</span>
+                <span className="font-normal text-[#8a7960]"> · {annonce.variete}</span>
               ) : null}
             </h1>
-            <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+            <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
               {[annonce.ville, annonce.region].filter(Boolean).join(", ") ||
                 "Localisation non precisee"}{" "}
               · {annonce.vues} vue{annonce.vues > 1 ? "s" : ""}
             </p>
           </div>
 
-          <div className="flex items-center justify-between rounded-xl border border-[#dfe3e0] bg-white p-4">
-            <span className="font-sans text-2xl font-bold text-[#0f5238]">
+          <div className="flex items-center justify-between rounded-xl border border-[#e4d3ae] bg-white p-4">
+            <span className="font-sans text-2xl font-bold text-[#8f3f1c]">
               {annonce.prixUnitaire.toLocaleString("fr-FR")} FCFA
             </span>
-            <span className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+            <span className="font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
               {annonce.quantite} en stock
             </span>
           </div>
 
           <Link
             href={`/producers/${annonce.producteur.id}`}
-            className="flex items-center justify-between rounded-xl border border-[#dfe3e0] bg-white p-4 hover:border-[#0f5238]"
+            className="flex items-center justify-between rounded-xl border border-[#e4d3ae] bg-white p-4 hover:border-[#b8552b]"
           >
             <div className="flex flex-col">
-              <span className="font-sans text-base font-semibold text-[#171c19]">
+              <span className="font-sans text-base font-semibold text-[#241a12]">
                 {annonce.producteur.nom}
                 {annonce.producteur.verifie ? " ✓" : ""}
               </span>
-              <span className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+              <span className="font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
                 {annonce.producteur.noteMoyenne != null && annonce.producteur.nombreAvis > 0
                   ? `${annonce.producteur.noteMoyenne.toFixed(1)}★ (${annonce.producteur.nombreAvis} avis)`
                   : "Pas encore d'avis"}
@@ -243,7 +243,7 @@ export default function AnnonceDetailPage() {
               return commandeExistante ? (
                 <Link
                   href="/orders"
-                  className="rounded-lg bg-[#eef3ef] px-4 py-3 text-center font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-[#e3e9e5]"
+                  className="rounded-lg bg-[#ebdfc3] px-4 py-3 text-center font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#4a3f33] hover:bg-[#e3e9e5]"
                 >
                   Vous avez deja commande ce plant · {commandeStatutLabels[commandeExistante.statut]}
                 </Link>
@@ -251,11 +251,11 @@ export default function AnnonceDetailPage() {
             })()}
 
           {annonce.statut !== "DISPONIBLE" ? (
-            <p className="rounded-lg bg-[#eef3ef] px-4 py-3 text-center font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#7c8a80]">
+            <p className="rounded-lg bg-[#ebdfc3] px-4 py-3 text-center font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#8a7960]">
               Cette annonce n&apos;est plus disponible
             </p>
           ) : sent ? (
-            <p className="rounded-lg bg-[#e3f3ea] px-4 py-3 text-center font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#0f5238]">
+            <p className="rounded-lg bg-[#e6ecdd] px-4 py-3 text-center font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#8f3f1c]">
               Demande envoyee
             </p>
           ) : ordering ? (
@@ -266,20 +266,20 @@ export default function AnnonceDetailPage() {
                 max={annonce.quantite}
                 value={quantite}
                 onChange={(e) => setQuantite(Number(e.target.value))}
-                className="w-20 rounded-lg border border-[#bfc9c1] px-3 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+                className="w-20 rounded-lg border border-[#d9c7a3] px-3 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b]"
               />
               <button
                 type="button"
                 disabled={orderLoading}
                 onClick={handleConfirmOrder}
-                className="flex-1 rounded-lg bg-[#0f5238] px-4 py-2.5 font-[family-name:var(--font-work-sans)] text-sm font-semibold text-white hover:bg-[#0c4029] disabled:opacity-60"
+                className="flex-1 rounded-lg bg-[#b8552b] px-4 py-2.5 font-[family-name:var(--font-work-sans)] text-sm font-semibold text-white hover:bg-[#8f3f1c] disabled:opacity-60"
               >
                 {orderLoading ? "Envoi..." : "Confirmer"}
               </button>
               <button
                 type="button"
                 onClick={() => setOrdering(false)}
-                className="rounded-lg border border-[#bfc9c1] px-4 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:bg-black/5"
+                className="rounded-lg border border-[#d9c7a3] px-4 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33] hover:bg-black/5"
               >
                 Annuler
               </button>
@@ -288,7 +288,7 @@ export default function AnnonceDetailPage() {
             <button
               type="button"
               onClick={handleOrderClick}
-              className="rounded-lg bg-[#0f5238] px-6 py-3 font-[family-name:var(--font-work-sans)] text-base font-semibold text-white hover:bg-[#0c4029]"
+              className="rounded-lg bg-[#b8552b] px-6 py-3 font-[family-name:var(--font-work-sans)] text-base font-semibold text-white hover:bg-[#8f3f1c]"
             >
               Commander
             </button>
@@ -298,20 +298,20 @@ export default function AnnonceDetailPage() {
             <button
               type="button"
               onClick={handleReportClick}
-              className="w-fit font-[family-name:var(--font-work-sans)] text-xs text-[#7c8a80] hover:text-[#7a1f14] hover:underline"
+              className="w-fit font-[family-name:var(--font-work-sans)] text-xs text-[#8a7960] hover:text-[#7a1f14] hover:underline"
             >
               Signaler cette annonce
             </button>
           )}
 
           {reporting && (
-            <div className="flex flex-col gap-2 rounded-lg border border-[#bfc9c1] p-3">
+            <div className="flex flex-col gap-2 rounded-lg border border-[#d9c7a3] p-3">
               <textarea
                 value={raison}
                 onChange={(e) => setRaison(e.target.value)}
                 placeholder="Motif du signalement..."
                 rows={2}
-                className="rounded-lg border border-[#bfc9c1] px-3 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+                className="rounded-lg border border-[#d9c7a3] px-3 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b]"
               />
               {reportError && (
                 <p className="font-[family-name:var(--font-work-sans)] text-xs text-[#7a1f14]">
@@ -323,14 +323,14 @@ export default function AnnonceDetailPage() {
                   type="button"
                   disabled={reportLoading || !raison.trim()}
                   onClick={handleConfirmReport}
-                  className="flex-1 rounded-lg bg-[#0f5238] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-xs font-medium text-white hover:bg-[#0c4029] disabled:opacity-60"
+                  className="flex-1 rounded-lg bg-[#b8552b] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-xs font-medium text-white hover:bg-[#8f3f1c] disabled:opacity-60"
                 >
                   {reportLoading ? "Envoi..." : "Envoyer"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setReporting(false)}
-                  className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-xs text-[#404943] hover:bg-black/5"
+                  className="rounded-lg border border-[#d9c7a3] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-xs text-[#4a3f33] hover:bg-black/5"
                 >
                   Annuler
                 </button>
@@ -339,7 +339,7 @@ export default function AnnonceDetailPage() {
           )}
 
           {reportSent && (
-            <p className="font-[family-name:var(--font-work-sans)] text-xs text-[#7c8a80]">
+            <p className="font-[family-name:var(--font-work-sans)] text-xs text-[#8a7960]">
               Signalement envoye, merci.
             </p>
           )}
@@ -347,12 +347,12 @@ export default function AnnonceDetailPage() {
       </div>
 
       <div className="flex flex-col gap-4">
-        <h2 className="font-sans text-xl font-semibold text-[#171c19]">
+        <h2 className="font-sans text-xl font-semibold text-[#241a12]">
           Avis sur {annonce.producteur.nom}
         </h2>
 
         {evaluations.length === 0 ? (
-          <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+          <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
             Ce producteur n&apos;a pas encore recu d&apos;avis.
           </p>
         ) : (
@@ -360,18 +360,18 @@ export default function AnnonceDetailPage() {
             {evaluations.map((evaluation) => (
               <div
                 key={evaluation.id}
-                className="flex flex-col gap-1 rounded-xl border border-[#dfe3e0] bg-white p-4"
+                className="flex flex-col gap-1 rounded-xl border border-[#e4d3ae] bg-white p-4"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-sans text-sm font-semibold text-[#171c19]">
+                  <span className="font-sans text-sm font-semibold text-[#241a12]">
                     {evaluation.auteur.nom}
                   </span>
-                  <span className="font-mono text-xs text-[#0f5238]">
+                  <span className="font-mono text-xs text-[#8f3f1c]">
                     {evaluation.note}★ · {timeAgo(evaluation.createdAt)}
                   </span>
                 </div>
                 {evaluation.commentaire && (
-                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
+                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33]">
                     {evaluation.commentaire}
                   </p>
                 )}

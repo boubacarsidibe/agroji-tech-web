@@ -132,8 +132,8 @@ function CatalogView() {
   return (
     <div className="mx-auto flex max-w-[1280px] flex-col gap-8 px-6 py-12">
       <div className="flex flex-col gap-2">
-        <h1 className="font-sans text-3xl font-bold text-[#171c19]">Catalogue</h1>
-        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#404943]">
+        <h1 className="font-sans text-3xl font-bold text-[#241a12]">Catalogue</h1>
+        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#4a3f33]">
           Parcourez les plants disponibles aupres des pepinieristes du Senegal.
         </p>
       </div>
@@ -144,12 +144,12 @@ function CatalogView() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Rechercher une espece ou variete..."
-          className="min-w-[240px] flex-1 rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+          className="min-w-[240px] flex-1 rounded-lg border border-[#d9c7a3] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b]"
         />
         <select
           value={categorie}
           onChange={(e) => setCategorie(e.target.value as Categorie | "")}
-          className="rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+          className="rounded-lg border border-[#d9c7a3] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b]"
         >
           {categories.map((c) => (
             <option key={c.value} value={c.value}>
@@ -162,12 +162,12 @@ function CatalogView() {
           value={region}
           onChange={(e) => setRegion(e.target.value)}
           placeholder="Region"
-          className="w-[160px] rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+          className="w-[160px] rounded-lg border border-[#d9c7a3] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b]"
         />
         <select
           value={tri}
           onChange={(e) => setTri(e.target.value as (typeof sortOptions)[number]["value"])}
-          className="rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+          className="rounded-lg border border-[#d9c7a3] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b]"
         >
           {sortOptions.map((s) => (
             <option key={s.value} value={s.value}>
@@ -182,34 +182,34 @@ function CatalogView() {
               type="button"
               disabled={saving}
               onClick={handleSaveRecherche}
-              className="whitespace-nowrap rounded-lg border border-[#0f5238] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#0f5238] hover:bg-[#0f5238]/5 disabled:opacity-60"
+              className="whitespace-nowrap rounded-lg border border-[#b8552b] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#8f3f1c] hover:bg-[#b8552b]/5 disabled:opacity-60"
             >
               {saved ? "Enregistree ✓" : saving ? "Enregistrement..." : "Sauvegarder cette recherche"}
             </button>
             <button
               type="button"
               onClick={() => setShowRecherches((v) => !v)}
-              className="whitespace-nowrap rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-black/5"
+              className="whitespace-nowrap rounded-lg border border-[#d9c7a3] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#4a3f33] hover:bg-black/5"
             >
               Mes recherches ({recherches.length})
             </button>
 
             {showRecherches && (
-              <div className="fixed inset-x-4 top-16 z-10 flex max-h-[70vh] w-auto flex-col overflow-hidden rounded-xl border border-[#dfe3e0] bg-white shadow-lg sm:absolute sm:inset-x-auto sm:right-0 sm:top-12 sm:w-72">
+              <div className="fixed inset-x-4 top-16 z-10 flex max-h-[70vh] w-auto flex-col overflow-hidden rounded-xl border border-[#e4d3ae] bg-white shadow-lg sm:absolute sm:inset-x-auto sm:right-0 sm:top-12 sm:w-72">
                 {recherches.length === 0 ? (
-                  <p className="px-4 py-6 text-center font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+                  <p className="px-4 py-6 text-center font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
                     Aucune recherche enregistree.
                   </p>
                 ) : (
                   recherches.map((r) => (
                     <div
                       key={r.id}
-                      className="flex items-center justify-between gap-2 border-b border-[#eef3ef] px-4 py-3 last:border-b-0 hover:bg-[#eef3ef]/60"
+                      className="flex items-center justify-between gap-2 border-b border-[#ebdfc3] px-4 py-3 last:border-b-0 hover:bg-[#ebdfc3]/60"
                     >
                       <button
                         type="button"
                         onClick={() => handleApplyRecherche(r)}
-                        className="flex-1 truncate text-left font-[family-name:var(--font-work-sans)] text-sm text-[#171c19]"
+                        className="flex-1 truncate text-left font-[family-name:var(--font-work-sans)] text-sm text-[#241a12]"
                       >
                         {r.nom}
                       </button>
@@ -243,7 +243,7 @@ function CatalogView() {
       )}
 
       {!error && !loading && (
-        <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+        <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
           {total} annonce{total > 1 ? "s" : ""} trouvee{total > 1 ? "s" : ""}
         </p>
       )}
@@ -251,11 +251,11 @@ function CatalogView() {
       {loading ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-[340px] animate-pulse rounded-xl bg-[#eef3ef]" />
+            <div key={i} className="h-[340px] animate-pulse rounded-xl bg-[#ebdfc3]" />
           ))}
         </div>
       ) : annonces.length === 0 && !error ? (
-        <p className="py-16 text-center font-[family-name:var(--font-work-sans)] text-base text-[#7c8a80]">
+        <p className="py-16 text-center font-[family-name:var(--font-work-sans)] text-base text-[#8a7960]">
           Aucune annonce ne correspond a votre recherche.
         </p>
       ) : (
