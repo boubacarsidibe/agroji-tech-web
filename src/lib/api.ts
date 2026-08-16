@@ -27,6 +27,7 @@ export type SearchAnnoncesParams = {
   q?: string;
   categorie?: Categorie;
   region?: string;
+  producteurId?: string;
   prixMin?: number;
   prixMax?: number;
   tri?: "pertinence" | "proximite" | "prixAsc" | "prixDesc";
@@ -315,6 +316,17 @@ export async function listProducteurs(
   params: ListProducteursParams
 ): Promise<ListProducteursResult> {
   return listUtilisateurs({ ...params, role: "PRODUCTEUR" });
+}
+
+export async function getUtilisateur(id: string): Promise<Producteur> {
+  const res = await fetch(`${API_URL}/api/utilisateurs/${id}`, { cache: "no-store" });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Utilisateur introuvable", res.status);
+  }
+
+  return body as Producteur;
 }
 
 export type StatutAnnonce = "DISPONIBLE" | "RUPTURE" | "ARCHIVEE";

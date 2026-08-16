@@ -205,7 +205,7 @@ export default function AnnonceDetailPage() {
           </div>
 
           <Link
-            href={`/producers`}
+            href={`/producers/${annonce.producteur.id}`}
             className="flex items-center justify-between rounded-xl border border-[#dfe3e0] bg-white p-4 hover:border-[#0f5238]"
           >
             <div className="flex flex-col">

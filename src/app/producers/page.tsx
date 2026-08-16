@@ -122,10 +122,10 @@ export default function ProducersPage() {
                     : "Pas encore d'avis"}
                 </span>
                 <Link
-                  href={`/catalog?region=${encodeURIComponent(producteur.region ?? "")}`}
+                  href={`/producers/${producteur.id}`}
                   className="font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#0f5238] hover:underline"
                 >
-                  Voir les annonces
+                  Voir le profil
                 </Link>
               </div>
             </div>
