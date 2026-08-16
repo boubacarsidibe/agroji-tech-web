@@ -76,6 +76,36 @@ export async function login(telephone: string, motDePasse: string): Promise<Logi
   return body as LoginResult;
 }
 
+export async function requestPasswordResetOtp(telephone: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/auth/otp/request`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ telephone }),
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible d'envoyer le code", res.status);
+  }
+}
+
+export async function resetPassword(data: {
+  telephone: string;
+  code: string;
+  nouveauMotDePasse: string;
+}): Promise<void> {
+  const res = await fetch(`${API_URL}/api/auth/password/reset`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Reinitialisation impossible", res.status);
+  }
+}
+
 export type RegisterInput = {
   nom: string;
   telephone: string;

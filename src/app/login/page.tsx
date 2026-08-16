@@ -56,9 +56,17 @@ export default function LoginPage() {
         </label>
 
         <label className="flex flex-col gap-1.5">
-          <span className="font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#171c19]">
-            Mot de passe
-          </span>
+          <div className="flex items-center justify-between">
+            <span className="font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#171c19]">
+              Mot de passe
+            </span>
+            <Link
+              href="/forgot-password"
+              className="font-[family-name:var(--font-work-sans)] text-xs font-medium text-[#0f5238] hover:underline"
+            >
+              Mot de passe oublie ?
+            </Link>
+          </div>
           <input
             type="password"
             required
