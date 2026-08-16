@@ -7,6 +7,7 @@ import {
   deleteAnnonce,
   listMesAnnonces,
   updateAnnonce,
+  uploadPhoto,
   ApiError,
   type Categorie,
   type MonAnnonce,
@@ -72,6 +73,9 @@ export default function DashboardPage() {
   const [savingPhotos, setSavingPhotos] = useState(false);
   const [photosError, setPhotosError] = useState<string | null>(null);
 
+  const [uploadingCreate, setUploadingCreate] = useState(false);
+  const [uploadingEdit, setUploadingEdit] = useState(false);
+
   function handlePhotoChange(list: string[], setList: (v: string[]) => void, index: number, value: string) {
     setList(list.map((p, i) => (i === index ? value : p)));
   }
@@ -82,6 +86,27 @@ export default function DashboardPage() {
 
   function handleRemovePhotoField(list: string[], setList: (v: string[]) => void, index: number) {
     setList(list.filter((_, i) => i !== index));
+  }
+
+  async function handleFileUpload(
+    file: File,
+    list: string[],
+    setList: (v: string[]) => void,
+    setUploading: (v: boolean) => void,
+    setUploadError: (v: string | null) => void
+  ) {
+    if (!session) return;
+    setUploading(true);
+    setUploadError(null);
+    try {
+      const url = await uploadPhoto(session.token, file);
+      const filled = list.filter((p) => p.trim());
+      setList(filled.length < 5 ? [...filled, url] : filled);
+    } catch (err) {
+      setUploadError(err instanceof ApiError ? err.message : "Envoi de la photo impossible.");
+    } finally {
+      setUploading(false);
+    }
   }
 
   function handleStartEditPhotos(annonce: MonAnnonce) {
@@ -330,9 +355,23 @@ export default function DashboardPage() {
                 onClick={() => handleAddPhotoField(photos, setPhotos)}
                 className="w-fit font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#0f5238] hover:underline"
               >
-                + Ajouter une photo
+                + Ajouter une photo (URL)
               </button>
             )}
+            <label className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-black/5">
+              {uploadingCreate ? "Envoi..." : "Importer une photo depuis mon appareil"}
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                disabled={uploadingCreate || photos.filter((p) => p.trim()).length >= 5}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFileUpload(file, photos, setPhotos, setUploadingCreate, setFormError);
+                  e.target.value = "";
+                }}
+                className="hidden"
+              />
+            </label>
           </div>
 
           {formError && (
@@ -479,9 +518,25 @@ export default function DashboardPage() {
                       onClick={() => handleAddPhotoField(editPhotos, setEditPhotos)}
                       className="w-fit font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#0f5238] hover:underline"
                     >
-                      + Ajouter une photo
+                      + Ajouter une photo (URL)
                     </button>
                   )}
+                  <label className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-black/5">
+                    {uploadingEdit ? "Envoi..." : "Importer une photo depuis mon appareil"}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      disabled={uploadingEdit || editPhotos.filter((p) => p.trim()).length >= 5}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleFileUpload(file, editPhotos, setEditPhotos, setUploadingEdit, setPhotosError);
+                        }
+                        e.target.value = "";
+                      }}
+                      className="hidden"
+                    />
+                  </label>
 
                   {photosError && (
                     <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7a1f14]">

@@ -344,6 +344,24 @@ export type AnnonceInput = {
 
 export type MonAnnonce = Omit<Annonce, "producteur"> & { statut: StatutAnnonce };
 
+export async function uploadPhoto(token: string, file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append("photo", file);
+
+  const res = await fetch(`${API_URL}/api/uploads`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible d'envoyer la photo", res.status);
+  }
+
+  return body.url as string;
+}
+
 export async function listMesAnnonces(token: string): Promise<MonAnnonce[]> {
   const res = await fetch(`${API_URL}/api/annonces/mine`, {
     headers: { Authorization: `Bearer ${token}` },
