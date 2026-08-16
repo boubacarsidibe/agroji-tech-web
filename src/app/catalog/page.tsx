@@ -195,7 +195,7 @@ function CatalogView() {
             </button>
 
             {showRecherches && (
-              <div className="absolute right-0 top-12 z-10 flex w-72 flex-col overflow-hidden rounded-xl border border-[#dfe3e0] bg-white shadow-lg">
+              <div className="fixed inset-x-4 top-16 z-10 flex max-h-[70vh] w-auto flex-col overflow-hidden rounded-xl border border-[#dfe3e0] bg-white shadow-lg sm:absolute sm:inset-x-auto sm:right-0 sm:top-12 sm:w-72">
                 {recherches.length === 0 ? (
                   <p className="px-4 py-6 text-center font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
                     Aucune recherche enregistree.

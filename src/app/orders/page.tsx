@@ -171,7 +171,7 @@ export default function OrdersPage() {
                 )}
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <span
                   className={`rounded-full px-3 py-1 font-mono text-xs font-medium ${statutColors[commande.statut]}`}
                 >

@@ -256,7 +256,7 @@ export default function AdminPage() {
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                   <span
                     className={`whitespace-nowrap rounded-full px-3 py-1 font-mono text-xs font-medium ${statutColors[signalement.statut]}`}
                   >

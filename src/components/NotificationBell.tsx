@@ -97,7 +97,7 @@ export default function NotificationBell({ session }: { session: Session }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-12 z-10 flex w-80 flex-col overflow-hidden rounded-xl border border-[#dfe3e0] bg-white shadow-lg">
+        <div className="fixed inset-x-4 top-16 z-10 flex max-h-[70vh] w-auto flex-col overflow-hidden rounded-xl border border-[#dfe3e0] bg-white shadow-lg sm:absolute sm:inset-x-auto sm:right-0 sm:top-12 sm:w-80">
           <div className="flex items-center justify-between border-b border-[#dfe3e0] px-4 py-3">
             <span className="font-sans text-sm font-semibold text-[#171c19]">Notifications</span>
             {unreadCount > 0 && (

@@ -586,3 +586,72 @@ export async function deleteRecherche(token: string, id: string): Promise<void> 
     throw new ApiError(body.error ?? "Suppression impossible", res.status);
   }
 }
+
+export type MonProfil = Producteur & {
+  telephone: string;
+  email?: string | null;
+};
+
+export type UpdateProfilInput = {
+  nom?: string;
+  photoUrl?: string;
+  description?: string;
+  ville?: string;
+  region?: string;
+};
+
+export async function getMonProfil(token: string): Promise<MonProfil> {
+  const res = await fetch(`${API_URL}/api/utilisateurs/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible de charger le profil", res.status);
+  }
+
+  return body as MonProfil;
+}
+
+export async function updateMonProfil(
+  token: string,
+  data: UpdateProfilInput
+): Promise<MonProfil> {
+  const res = await fetch(`${API_URL}/api/utilisateurs/me`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Mise a jour impossible", res.status);
+  }
+
+  return body as MonProfil;
+}
+
+export async function deactivateMonCompte(token: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/utilisateurs/me/deactivate`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Desactivation impossible", res.status);
+  }
+}
+
+export async function deleteMonCompte(token: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/utilisateurs/me`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Suppression impossible", res.status);
+  }
+}
