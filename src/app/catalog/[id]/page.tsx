@@ -14,6 +14,7 @@ import {
 } from "@/lib/api";
 import { getSession, subscribeToAuthChanges } from "@/lib/auth";
 import { categorieColors } from "@/lib/colors";
+import { invalidateMesCommandes, useMesCommandesAcheteur } from "@/lib/commandesStore";
 
 const categorieLabels: Record<AnnonceDetail["categorie"], string> = {
   FRUITIER: "Fruitier",
@@ -21,6 +22,13 @@ const categorieLabels: Record<AnnonceDetail["categorie"], string> = {
   MARAICHER: "Maraicher",
   ORNEMENTAL: "Ornemental",
 };
+
+const commandeStatutLabels = {
+  ENVOYEE: "envoyee",
+  ACCEPTEE: "acceptee",
+  REFUSEE: "refusee",
+  FINALISEE: "finalisee",
+} as const;
 
 function timeAgo(iso: string): string {
   const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
@@ -33,6 +41,7 @@ export default function AnnonceDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const session = useSyncExternalStore(subscribeToAuthChanges, getSession, () => null);
+  const { commandes: mesCommandes } = useMesCommandesAcheteur(session);
 
   const [annonce, setAnnonce] = useState<AnnonceDetail | null>(null);
   const [evaluations, setEvaluations] = useState<EvaluationAvecAuteur[]>([]);
@@ -87,6 +96,7 @@ export default function AnnonceDetailPage() {
 
     try {
       await createCommande(session.token, { annonceId: annonce.id, quantiteDemandee: quantite });
+      invalidateMesCommandes();
       setSent(true);
       setOrdering(false);
     } catch (err) {
@@ -226,6 +236,19 @@ export default function AnnonceDetailPage() {
               {orderError}
             </p>
           )}
+
+          {!sent &&
+            (() => {
+              const commandeExistante = mesCommandes.find((c) => c.annonceId === annonce.id);
+              return commandeExistante ? (
+                <Link
+                  href="/orders"
+                  className="rounded-lg bg-[#eef3ef] px-4 py-3 text-center font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-[#e3e9e5]"
+                >
+                  Vous avez deja commande ce plant · {commandeStatutLabels[commandeExistante.statut]}
+                </Link>
+              ) : null;
+            })()}
 
           {annonce.statut !== "DISPONIBLE" ? (
             <p className="rounded-lg bg-[#eef3ef] px-4 py-3 text-center font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#7c8a80]">

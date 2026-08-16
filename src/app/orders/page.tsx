@@ -27,6 +27,14 @@ const statutColors: Record<StatutCommande, string> = {
   FINALISEE: "bg-[#0f5238] text-white",
 };
 
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 export default function OrdersPage() {
   const router = useRouter();
   const session = useSyncExternalStore(subscribeToAuthChanges, getSession, () => null);
@@ -157,12 +165,18 @@ export default function OrdersPage() {
               className="flex flex-col gap-3 rounded-xl border border-[#dfe3e0] bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="flex flex-col gap-1">
-                <p className="font-sans text-base font-semibold text-[#171c19]">
+                <Link
+                  href={`/catalog/${commande.annonceId}`}
+                  className="font-sans text-base font-semibold text-[#171c19] hover:text-[#0f5238]"
+                >
                   {commande.annonce.espece}
                   {commande.annonce.variete ? ` · ${commande.annonce.variete}` : ""}
-                </p>
+                </Link>
                 <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
                   Quantite: {commande.quantiteDemandee} · {commande.annonce.prixUnitaire.toLocaleString("fr-FR")} FCFA/unite
+                </p>
+                <p className="font-[family-name:var(--font-work-sans)] text-xs text-[#7c8a80]">
+                  Commande le {formatDate(commande.createdAt)}
                 </p>
                 {commande.message && (
                   <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">

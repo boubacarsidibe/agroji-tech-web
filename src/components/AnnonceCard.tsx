@@ -6,6 +6,7 @@ import Link from "next/link";
 import { createCommande, createSignalement, ApiError, type Annonce } from "@/lib/api";
 import { getSession, subscribeToAuthChanges } from "@/lib/auth";
 import { categorieColors } from "@/lib/colors";
+import { invalidateMesCommandes, useMesCommandesAcheteur } from "@/lib/commandesStore";
 
 const categorieLabels: Record<Annonce["categorie"], string> = {
   FRUITIER: "Fruitier",
@@ -14,10 +15,19 @@ const categorieLabels: Record<Annonce["categorie"], string> = {
   ORNEMENTAL: "Ornemental",
 };
 
+const commandeStatutLabels = {
+  ENVOYEE: "envoyee",
+  ACCEPTEE: "acceptee",
+  REFUSEE: "refusee",
+  FINALISEE: "finalisee",
+} as const;
+
 export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
   const router = useRouter();
   const session = useSyncExternalStore(subscribeToAuthChanges, getSession, () => null);
   const photo = annonce.photos[0];
+  const { commandes: mesCommandes } = useMesCommandesAcheteur(session);
+  const commandeExistante = mesCommandes.find((c) => c.annonceId === annonce.id);
 
   const [ordering, setOrdering] = useState(false);
   const [quantite, setQuantite] = useState(1);
@@ -47,6 +57,7 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
 
     try {
       await createCommande(session.token, { annonceId: annonce.id, quantiteDemandee: quantite });
+      invalidateMesCommandes();
       setSent(true);
       setOrdering(false);
     } catch (err) {
@@ -193,6 +204,15 @@ export default function AnnonceCard({ annonce }: { annonce: Annonce }) {
           <p className="rounded-lg bg-[#fdecea] px-3 py-2 font-[family-name:var(--font-work-sans)] text-xs text-[#7a1f14]">
             {error}
           </p>
+        )}
+
+        {commandeExistante && !sent && (
+          <Link
+            href="/orders"
+            className="rounded-lg bg-[#eef3ef] px-3 py-2 text-center font-[family-name:var(--font-work-sans)] text-xs font-medium text-[#404943] hover:bg-[#e3e9e5]"
+          >
+            Vous avez deja commande ce plant · {commandeStatutLabels[commandeExistante.statut]}
+          </Link>
         )}
 
         {sent ? (
