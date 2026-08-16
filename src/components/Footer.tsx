@@ -1,12 +1,14 @@
+import Link from "next/link";
+
 const platformLinks = [
-  { label: "Agricultural Advice", href: "#" },
-  { label: "Contact Us", href: "#" },
+  { label: "Agricultural Advice", href: "/agricultural-advice" },
+  { label: "Contact Us", href: "/contact" },
 ];
 
 const legalLinks = [
-  { label: "Privacy Policy", href: "#" },
-  { label: "Terms of Service", href: "#" },
-  { label: "Legal Mentions", href: "#" },
+  { label: "Privacy Policy", href: "/privacy-policy" },
+  { label: "Terms of Service", href: "/terms-of-service" },
+  { label: "Legal Mentions", href: "/legal-mentions" },
 ];
 
 function FooterColumn({
@@ -24,12 +26,12 @@ function FooterColumn({
       <ul className="flex flex-col items-start gap-3">
         {links.map((link) => (
           <li key={link.label}>
-            <a
+            <Link
               href={link.href}
               className="font-mono text-xs font-medium leading-4 text-[#d5d8f9] hover:text-[#b1f0ce]"
             >
               {link.label}
-            </a>
+            </Link>
           </li>
         ))}
       </ul>
