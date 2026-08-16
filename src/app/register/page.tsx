@@ -80,15 +80,15 @@ export default function RegisterPage() {
   }
 
   const inputClass =
-    "rounded-lg border border-[#d9c7a3] px-4 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b]";
-  const labelClass = "font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#241a12]";
+    "rounded-lg border border-[#bfc9c1] px-4 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]";
+  const labelClass = "font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#171c19]";
 
   if (step === "otp") {
     return (
       <div className="mx-auto flex max-w-[420px] flex-col gap-8 px-6 py-24">
         <div className="flex flex-col gap-2">
-          <h1 className="font-sans text-3xl font-bold text-[#241a12]">Verification</h1>
-          <p className="font-[family-name:var(--font-work-sans)] text-base text-[#4a3f33]">
+          <h1 className="font-sans text-3xl font-bold text-[#171c19]">Verification</h1>
+          <p className="font-[family-name:var(--font-work-sans)] text-base text-[#404943]">
             Un code a 6 chiffres a ete envoye par SMS au {telephone}.
           </p>
         </div>
@@ -117,7 +117,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 rounded-lg bg-[#b8552b] px-6 py-3 font-[family-name:var(--font-work-sans)] text-base font-semibold text-white hover:bg-[#8f3f1c] disabled:opacity-60"
+            className="mt-2 rounded-lg bg-[#0f5238] px-6 py-3 font-[family-name:var(--font-work-sans)] text-base font-semibold text-white hover:bg-[#0c4029] disabled:opacity-60"
           >
             {loading ? "Verification..." : "Verifier et continuer"}
           </button>
@@ -129,8 +129,8 @@ export default function RegisterPage() {
   return (
     <div className="mx-auto flex max-w-[560px] flex-col gap-8 px-6 py-24">
       <div className="flex flex-col gap-2">
-        <h1 className="font-sans text-3xl font-bold text-[#241a12]">Creer un compte</h1>
-        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#4a3f33]">
+        <h1 className="font-sans text-3xl font-bold text-[#171c19]">Creer un compte</h1>
+        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#404943]">
           Rejoignez AgroJi-Tech pour commander des plants aupres des pepinieristes du Senegal.
         </p>
       </div>
@@ -213,9 +213,9 @@ export default function RegisterPage() {
             type="checkbox"
             checked={aussiProducteur}
             onChange={(e) => setAussiProducteur(e.target.checked)}
-            className="size-4 accent-[#b8552b]"
+            className="size-4 accent-[#0f5238]"
           />
-          <span className="font-[family-name:var(--font-work-sans)] text-sm text-[#241a12]">
+          <span className="font-[family-name:var(--font-work-sans)] text-sm text-[#171c19]">
             Je suis aussi producteur (pepinieriste)
           </span>
         </label>
@@ -242,14 +242,14 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-2 rounded-lg bg-[#b8552b] px-6 py-3 font-[family-name:var(--font-work-sans)] text-base font-semibold text-white hover:bg-[#8f3f1c] disabled:opacity-60"
+          className="mt-2 rounded-lg bg-[#0f5238] px-6 py-3 font-[family-name:var(--font-work-sans)] text-base font-semibold text-white hover:bg-[#0c4029] disabled:opacity-60"
         >
           {loading ? "Inscription..." : "Creer mon compte"}
         </button>
 
-        <p className="text-center font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33]">
+        <p className="text-center font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
           Deja un compte ?{" "}
-          <Link href="/login" className="font-medium text-[#8f3f1c] hover:underline">
+          <Link href="/login" className="font-medium text-[#0f5238] hover:underline">
             Se connecter
           </Link>
         </p>

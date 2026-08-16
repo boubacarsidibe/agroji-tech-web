@@ -37,14 +37,14 @@ const statutLabels: Record<StatutAnnonce, string> = {
 };
 
 const statutColors: Record<StatutAnnonce, string> = {
-  DISPONIBLE: "bg-[#e6ecdd] text-[#8f3f1c]",
+  DISPONIBLE: "bg-[#e3f3ea] text-[#0f5238]",
   RUPTURE: "bg-[#fdecea] text-[#7a1f14]",
-  ARCHIVEE: "bg-[#ebdfc3] text-[#4a3f33]",
+  ARCHIVEE: "bg-[#eef3ef] text-[#404943]",
 };
 
 const inputClass =
-  "rounded-lg border border-[#d9c7a3] px-4 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b]";
-const labelClass = "font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#241a12]";
+  "rounded-lg border border-[#bfc9c1] px-4 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]";
+const labelClass = "font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#171c19]";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -214,7 +214,7 @@ export default function DashboardPage() {
   if (!session || !isProducteur) {
     return (
       <div className="flex flex-1 items-center justify-center px-6 py-24">
-        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#4a3f33]">
+        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#404943]">
           Redirection...
         </p>
       </div>
@@ -225,15 +225,15 @@ export default function DashboardPage() {
     <div className="mx-auto flex max-w-[900px] flex-col gap-8 px-6 py-12">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-2">
-          <h1 className="font-sans text-3xl font-bold text-[#241a12]">Mes annonces</h1>
-          <p className="font-[family-name:var(--font-work-sans)] text-base text-[#4a3f33]">
+          <h1 className="font-sans text-3xl font-bold text-[#171c19]">Mes annonces</h1>
+          <p className="font-[family-name:var(--font-work-sans)] text-base text-[#404943]">
             Gerez vos plants publies sur le catalogue.
           </p>
         </div>
         <button
           type="button"
           onClick={() => setShowForm((v) => !v)}
-          className="whitespace-nowrap rounded-lg bg-[#b8552b] px-6 py-2.5 font-[family-name:var(--font-work-sans)] text-sm font-semibold text-white hover:bg-[#8f3f1c]"
+          className="whitespace-nowrap rounded-lg bg-[#0f5238] px-6 py-2.5 font-[family-name:var(--font-work-sans)] text-sm font-semibold text-white hover:bg-[#0c4029]"
         >
           {showForm ? "Annuler" : "Nouvelle annonce"}
         </button>
@@ -242,7 +242,7 @@ export default function DashboardPage() {
       {showForm && (
         <form
           onSubmit={handleCreate}
-          className="flex flex-col gap-4 rounded-xl border border-[#e4d3ae] bg-white p-5"
+          className="flex flex-col gap-4 rounded-xl border border-[#dfe3e0] bg-white p-5"
         >
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <label className="flex flex-col gap-1.5">
@@ -342,7 +342,7 @@ export default function DashboardPage() {
                   <button
                     type="button"
                     onClick={() => handleRemovePhotoField(photos, setPhotos, i)}
-                    className="rounded-lg border border-[#d9c7a3] px-3 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#7a1f14] hover:bg-black/5"
+                    className="rounded-lg border border-[#bfc9c1] px-3 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#7a1f14] hover:bg-black/5"
                   >
                     Retirer
                   </button>
@@ -353,12 +353,12 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => handleAddPhotoField(photos, setPhotos)}
-                className="w-fit font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#8f3f1c] hover:underline"
+                className="w-fit font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#0f5238] hover:underline"
               >
                 + Ajouter une photo (URL)
               </button>
             )}
-            <label className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#d9c7a3] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#4a3f33] hover:bg-black/5">
+            <label className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-black/5">
               {uploadingCreate ? "Envoi..." : "Importer une photo depuis mon appareil"}
               <input
                 type="file"
@@ -383,7 +383,7 @@ export default function DashboardPage() {
           <button
             type="submit"
             disabled={creating}
-            className="mt-2 rounded-lg bg-[#b8552b] px-6 py-3 font-[family-name:var(--font-work-sans)] text-base font-semibold text-white hover:bg-[#8f3f1c] disabled:opacity-60"
+            className="mt-2 rounded-lg bg-[#0f5238] px-6 py-3 font-[family-name:var(--font-work-sans)] text-base font-semibold text-white hover:bg-[#0c4029] disabled:opacity-60"
           >
             {creating ? "Publication..." : "Publier l'annonce"}
           </button>
@@ -399,11 +399,11 @@ export default function DashboardPage() {
       {loading ? (
         <div className="flex flex-col gap-3">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-24 animate-pulse rounded-xl bg-[#ebdfc3]" />
+            <div key={i} className="h-24 animate-pulse rounded-xl bg-[#eef3ef]" />
           ))}
         </div>
       ) : annonces.length === 0 ? (
-        <p className="py-16 text-center font-[family-name:var(--font-work-sans)] text-base text-[#8a7960]">
+        <p className="py-16 text-center font-[family-name:var(--font-work-sans)] text-base text-[#7c8a80]">
           Vous n&apos;avez pas encore publie d&apos;annonce.
         </p>
       ) : (
@@ -411,7 +411,7 @@ export default function DashboardPage() {
           {annonces.map((annonce) => (
             <div
               key={annonce.id}
-              className={`flex flex-col gap-3 overflow-hidden rounded-xl border-l-4 border-[#e4d3ae] bg-white p-4 ${categorieColors[annonce.categorie].ring.replace("border-", "border-l-")}`}
+              className={`flex flex-col gap-3 overflow-hidden rounded-xl border-l-4 border-[#dfe3e0] bg-white p-4 ${categorieColors[annonce.categorie].ring.replace("border-", "border-l-")}`}
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3">
@@ -423,13 +423,13 @@ export default function DashboardPage() {
                       className="size-14 shrink-0 rounded-lg object-cover"
                     />
                   ) : (
-                    <div className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-[#ebdfc3] text-xs text-[#8a7960]">
+                    <div className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-[#eef3ef] text-xs text-[#7c8a80]">
                       Pas de photo
                     </div>
                   )}
                   <div className="flex flex-col gap-1.5">
                     <div className="flex items-center gap-2">
-                      <p className="font-sans text-base font-semibold text-[#241a12]">
+                      <p className="font-sans text-base font-semibold text-[#171c19]">
                         {annonce.espece}
                         {annonce.variete ? ` · ${annonce.variete}` : ""}
                       </p>
@@ -439,7 +439,7 @@ export default function DashboardPage() {
                         {categorieLabels[annonce.categorie]}
                       </span>
                     </div>
-                    <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
+                    <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
                       {annonce.quantite} en stock · {annonce.prixUnitaire.toLocaleString("fr-FR")} FCFA/unite
                     </p>
                   </div>
@@ -456,7 +456,7 @@ export default function DashboardPage() {
                     value={annonce.statut}
                     disabled={actionId === annonce.id}
                     onChange={(e) => handleStatutChange(annonce.id, e.target.value as StatutAnnonce)}
-                    className="rounded-lg border border-[#d9c7a3] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b] disabled:opacity-60"
+                    className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238] disabled:opacity-60"
                   >
                     {(Object.keys(statutLabels) as StatutAnnonce[]).map((s) => (
                       <option key={s} value={s}>
@@ -472,7 +472,7 @@ export default function DashboardPage() {
                         ? setEditingPhotosId(null)
                         : handleStartEditPhotos(annonce)
                     }
-                    className="rounded-lg border border-[#d9c7a3] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#4a3f33] hover:bg-black/5"
+                    className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-black/5"
                   >
                     Photos
                   </button>
@@ -481,7 +481,7 @@ export default function DashboardPage() {
                     type="button"
                     disabled={actionId === annonce.id}
                     onClick={() => handleDelete(annonce.id)}
-                    className="rounded-lg border border-[#d9c7a3] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#7a1f14] hover:bg-black/5 disabled:opacity-60"
+                    className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#7a1f14] hover:bg-black/5 disabled:opacity-60"
                   >
                     Supprimer
                   </button>
@@ -489,7 +489,7 @@ export default function DashboardPage() {
               </div>
 
               {editingPhotosId === annonce.id && (
-                <div className="flex flex-col gap-2 rounded-lg border border-[#d9c7a3] p-3">
+                <div className="flex flex-col gap-2 rounded-lg border border-[#bfc9c1] p-3">
                   {editPhotos.map((photo, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <input
@@ -505,7 +505,7 @@ export default function DashboardPage() {
                         <button
                           type="button"
                           onClick={() => handleRemovePhotoField(editPhotos, setEditPhotos, i)}
-                          className="rounded-lg border border-[#d9c7a3] px-3 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#7a1f14] hover:bg-black/5"
+                          className="rounded-lg border border-[#bfc9c1] px-3 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#7a1f14] hover:bg-black/5"
                         >
                           Retirer
                         </button>
@@ -516,12 +516,12 @@ export default function DashboardPage() {
                     <button
                       type="button"
                       onClick={() => handleAddPhotoField(editPhotos, setEditPhotos)}
-                      className="w-fit font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#8f3f1c] hover:underline"
+                      className="w-fit font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#0f5238] hover:underline"
                     >
                       + Ajouter une photo (URL)
                     </button>
                   )}
-                  <label className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#d9c7a3] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#4a3f33] hover:bg-black/5">
+                  <label className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-black/5">
                     {uploadingEdit ? "Envoi..." : "Importer une photo depuis mon appareil"}
                     <input
                       type="file"
@@ -549,14 +549,14 @@ export default function DashboardPage() {
                       type="button"
                       disabled={savingPhotos}
                       onClick={() => handleSavePhotos(annonce.id)}
-                      className="rounded-lg bg-[#b8552b] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#8f3f1c] disabled:opacity-60"
+                      className="rounded-lg bg-[#0f5238] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#0c4029] disabled:opacity-60"
                     >
                       {savingPhotos ? "Enregistrement..." : "Enregistrer"}
                     </button>
                     <button
                       type="button"
                       onClick={() => setEditingPhotosId(null)}
-                      className="rounded-lg border border-[#d9c7a3] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33] hover:bg-black/5"
+                      className="rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:bg-black/5"
                     >
                       Annuler
                     </button>

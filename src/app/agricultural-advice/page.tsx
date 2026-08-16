@@ -32,19 +32,19 @@ const articles = [
 ];
 
 const categorieColors: Record<string, string> = {
-  Fruitier: "bg-[#e6ecdd] text-[#8f3f1c]",
-  Maraicher: "bg-[#ebdfc3] text-[#8f3f1c]",
+  Fruitier: "bg-[#e3f3ea] text-[#0f5238]",
+  Maraicher: "bg-[#eef3ef] text-[#0f5238]",
   Forestier: "bg-[#f3ede3] text-[#6b4e0f]",
   Ornemental: "bg-[#f3e3ee] text-[#6b0f4e]",
-  General: "bg-[#eef0f3] text-[#241c15]",
+  General: "bg-[#eef0f3] text-[#2b3252]",
 };
 
 export default function AgriculturalAdvicePage() {
   return (
     <div className="mx-auto flex max-w-[820px] flex-col gap-10 px-6 py-24">
       <div className="flex flex-col gap-2">
-        <h1 className="font-sans text-3xl font-bold text-[#241a12]">Conseils agricoles</h1>
-        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#4a3f33]">
+        <h1 className="font-sans text-3xl font-bold text-[#171c19]">Conseils agricoles</h1>
+        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#404943]">
           Quelques recommandations pratiques pour choisir, planter et entretenir vos plants au
           Senegal.
         </p>
@@ -54,15 +54,15 @@ export default function AgriculturalAdvicePage() {
         {articles.map((article) => (
           <article
             key={article.titre}
-            className="flex flex-col gap-2 rounded-xl border border-[#e4d3ae] bg-white p-5"
+            className="flex flex-col gap-2 rounded-xl border border-[#dfe3e0] bg-white p-5"
           >
             <span
               className={`w-fit rounded-full px-3 py-1 font-mono text-xs font-medium ${categorieColors[article.categorie]}`}
             >
               {article.categorie}
             </span>
-            <h2 className="font-sans text-lg font-semibold text-[#241a12]">{article.titre}</h2>
-            <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33]">
+            <h2 className="font-sans text-lg font-semibold text-[#171c19]">{article.titre}</h2>
+            <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
               {article.contenu}
             </p>
           </article>

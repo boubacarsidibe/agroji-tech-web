@@ -6,8 +6,8 @@ import Link from "next/link";
 import { requestPasswordResetOtp, resetPassword, ApiError } from "@/lib/api";
 
 const inputClass =
-  "rounded-lg border border-[#d9c7a3] px-4 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b]";
-const labelClass = "font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#241a12]";
+  "rounded-lg border border-[#bfc9c1] px-4 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]";
+const labelClass = "font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#171c19]";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -53,8 +53,8 @@ export default function ForgotPasswordPage() {
   if (success) {
     return (
       <div className="mx-auto flex max-w-[420px] flex-col gap-6 px-6 py-24 text-center">
-        <h1 className="font-sans text-2xl font-bold text-[#241a12]">Mot de passe reinitialise</h1>
-        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#4a3f33]">
+        <h1 className="font-sans text-2xl font-bold text-[#171c19]">Mot de passe reinitialise</h1>
+        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#404943]">
           Vous allez etre redirige vers la page de connexion...
         </p>
       </div>
@@ -64,8 +64,8 @@ export default function ForgotPasswordPage() {
   return (
     <div className="mx-auto flex max-w-[420px] flex-col gap-8 px-6 py-24">
       <div className="flex flex-col gap-2">
-        <h1 className="font-sans text-3xl font-bold text-[#241a12]">Mot de passe oublie</h1>
-        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#4a3f33]">
+        <h1 className="font-sans text-3xl font-bold text-[#171c19]">Mot de passe oublie</h1>
+        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#404943]">
           {step === "phone"
             ? "Entrez votre numero de telephone pour recevoir un code de verification."
             : `Un code a 6 chiffres a ete envoye par SMS au ${telephone}.`}
@@ -95,7 +95,7 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 rounded-lg bg-[#b8552b] px-6 py-3 font-[family-name:var(--font-work-sans)] text-base font-semibold text-white hover:bg-[#8f3f1c] disabled:opacity-60"
+            className="mt-2 rounded-lg bg-[#0f5238] px-6 py-3 font-[family-name:var(--font-work-sans)] text-base font-semibold text-white hover:bg-[#0c4029] disabled:opacity-60"
           >
             {loading ? "Envoi..." : "Envoyer le code"}
           </button>
@@ -137,7 +137,7 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 rounded-lg bg-[#b8552b] px-6 py-3 font-[family-name:var(--font-work-sans)] text-base font-semibold text-white hover:bg-[#8f3f1c] disabled:opacity-60"
+            className="mt-2 rounded-lg bg-[#0f5238] px-6 py-3 font-[family-name:var(--font-work-sans)] text-base font-semibold text-white hover:bg-[#0c4029] disabled:opacity-60"
           >
             {loading ? "Reinitialisation..." : "Reinitialiser le mot de passe"}
           </button>
@@ -145,15 +145,15 @@ export default function ForgotPasswordPage() {
           <button
             type="button"
             onClick={() => setStep("phone")}
-            className="text-center font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33] hover:underline"
+            className="text-center font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:underline"
           >
             Changer de numero
           </button>
         </form>
       )}
 
-      <p className="text-center font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33]">
-        <Link href="/login" className="font-medium text-[#8f3f1c] hover:underline">
+      <p className="text-center font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
+        <Link href="/login" className="font-medium text-[#0f5238] hover:underline">
           Retour a la connexion
         </Link>
       </p>

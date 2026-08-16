@@ -59,8 +59,8 @@ export default function ProducerDetailPage() {
   if (loading) {
     return (
       <div className="mx-auto flex max-w-[1000px] flex-col gap-6 px-6 py-12">
-        <div className="h-40 animate-pulse rounded-xl bg-[#ebdfc3]" />
-        <div className="h-64 animate-pulse rounded-xl bg-[#ebdfc3]" />
+        <div className="h-40 animate-pulse rounded-xl bg-[#eef3ef]" />
+        <div className="h-64 animate-pulse rounded-xl bg-[#eef3ef]" />
       </div>
     );
   }
@@ -71,7 +71,7 @@ export default function ProducerDetailPage() {
         <p className="font-[family-name:var(--font-work-sans)] text-base text-[#7a1f14]">
           {error ?? "Producteur introuvable."}
         </p>
-        <Link href="/producers" className="font-medium text-[#8f3f1c] hover:underline">
+        <Link href="/producers" className="font-medium text-[#0f5238] hover:underline">
           Retour aux producteurs
         </Link>
       </div>
@@ -82,12 +82,12 @@ export default function ProducerDetailPage() {
     <div className="mx-auto flex max-w-[1000px] flex-col gap-10 px-6 py-12">
       <Link
         href="/producers"
-        className="w-fit font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33] hover:text-[#8f3f1c]"
+        className="w-fit font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:text-[#0f5238]"
       >
         ← Retour aux producteurs
       </Link>
 
-      <div className="flex flex-col gap-4 rounded-xl border border-[#e4d3ae] bg-white p-6 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-4 rounded-xl border border-[#dfe3e0] bg-white p-6 sm:flex-row sm:items-center">
         {producteur.photoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- photo host is user-provided, unknown at build time
           <img
@@ -96,27 +96,27 @@ export default function ProducerDetailPage() {
             className="size-20 rounded-full object-cover"
           />
         ) : (
-          <div className="flex size-20 items-center justify-center rounded-full bg-[#ebdfc3] font-sans text-2xl font-semibold text-[#8f3f1c]">
+          <div className="flex size-20 items-center justify-center rounded-full bg-[#eef3ef] font-sans text-2xl font-semibold text-[#0f5238]">
             {producteur.nom.charAt(0).toUpperCase()}
           </div>
         )}
 
         <div className="flex flex-col gap-1">
-          <h1 className="font-sans text-2xl font-bold text-[#241a12]">
+          <h1 className="font-sans text-2xl font-bold text-[#171c19]">
             {producteur.nom}
             {producteur.verifie ? " ✓" : ""}
           </h1>
-          <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
+          <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
             {[producteur.ville, producteur.region].filter(Boolean).join(", ") ||
               "Localisation non precisee"}
           </p>
-          <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
+          <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
             {producteur.nombreAvis > 0
               ? `${producteur.noteMoyenne.toFixed(1)}★ (${producteur.nombreAvis} avis)`
               : "Pas encore d'avis"}
           </p>
           {producteur.description && (
-            <p className="mt-2 font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33]">
+            <p className="mt-2 font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
               {producteur.description}
             </p>
           )}
@@ -124,12 +124,12 @@ export default function ProducerDetailPage() {
       </div>
 
       <div className="flex flex-col gap-4">
-        <h2 className="font-sans text-xl font-semibold text-[#241a12]">
+        <h2 className="font-sans text-xl font-semibold text-[#171c19]">
           Annonces disponibles ({annonces.length})
         </h2>
 
         {annonces.length === 0 ? (
-          <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
+          <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
             Aucune annonce disponible pour le moment.
           </p>
         ) : (
@@ -142,10 +142,10 @@ export default function ProducerDetailPage() {
       </div>
 
       <div className="flex flex-col gap-4">
-        <h2 className="font-sans text-xl font-semibold text-[#241a12]">Avis</h2>
+        <h2 className="font-sans text-xl font-semibold text-[#171c19]">Avis</h2>
 
         {evaluations.length === 0 ? (
-          <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
+          <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
             Ce producteur n&apos;a pas encore recu d&apos;avis.
           </p>
         ) : (
@@ -153,18 +153,18 @@ export default function ProducerDetailPage() {
             {evaluations.map((evaluation) => (
               <div
                 key={evaluation.id}
-                className="flex flex-col gap-1 rounded-xl border border-[#e4d3ae] bg-white p-4"
+                className="flex flex-col gap-1 rounded-xl border border-[#dfe3e0] bg-white p-4"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-sans text-sm font-semibold text-[#241a12]">
+                  <span className="font-sans text-sm font-semibold text-[#171c19]">
                     {evaluation.auteur.nom}
                   </span>
-                  <span className="font-mono text-xs text-[#8f3f1c]">
+                  <span className="font-mono text-xs text-[#0f5238]">
                     {evaluation.note}★ · {timeAgo(evaluation.createdAt)}
                   </span>
                 </div>
                 {evaluation.commentaire && (
-                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33]">
+                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
                     {evaluation.commentaire}
                   </p>
                 )}

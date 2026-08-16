@@ -13,8 +13,8 @@ import {
 import { clearSession, getSession, subscribeToAuthChanges } from "@/lib/auth";
 
 const inputClass =
-  "rounded-lg border border-[#d9c7a3] px-4 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#241a12] outline-none focus:border-[#b8552b]";
-const labelClass = "font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#241a12]";
+  "rounded-lg border border-[#bfc9c1] px-4 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]";
+const labelClass = "font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#171c19]";
 
 export default function AccountPage() {
   const router = useRouter();
@@ -118,7 +118,7 @@ export default function AccountPage() {
   if (!session) {
     return (
       <div className="flex flex-1 items-center justify-center px-6 py-24">
-        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#4a3f33]">
+        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#404943]">
           Redirection vers la connexion...
         </p>
       </div>
@@ -128,8 +128,8 @@ export default function AccountPage() {
   return (
     <div className="mx-auto flex max-w-[560px] flex-col gap-10 px-6 py-12">
       <div className="flex flex-col gap-2">
-        <h1 className="font-sans text-3xl font-bold text-[#241a12]">Mon compte</h1>
-        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#4a3f33]">
+        <h1 className="font-sans text-3xl font-bold text-[#171c19]">Mon compte</h1>
+        <p className="font-[family-name:var(--font-work-sans)] text-base text-[#404943]">
           Gerez vos informations personnelles.
         </p>
       </div>
@@ -141,12 +141,12 @@ export default function AccountPage() {
       )}
 
       {loading ? (
-        <div className="h-64 animate-pulse rounded-xl bg-[#ebdfc3]" />
+        <div className="h-64 animate-pulse rounded-xl bg-[#eef3ef]" />
       ) : profil ? (
         <>
           <form
             onSubmit={handleSave}
-            className="flex flex-col gap-4 rounded-xl border border-[#e4d3ae] bg-white p-5"
+            className="flex flex-col gap-4 rounded-xl border border-[#dfe3e0] bg-white p-5"
           >
             <label className="flex flex-col gap-1.5">
               <span className={labelClass}>Nom complet</span>
@@ -162,7 +162,7 @@ export default function AccountPage() {
 
             <div className="flex flex-col gap-1.5">
               <span className={labelClass}>Telephone</span>
-              <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#8a7960]">
+              <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
                 {profil.telephone} (non modifiable)
               </p>
             </div>
@@ -209,7 +209,7 @@ export default function AccountPage() {
             <button
               type="submit"
               disabled={saving}
-              className="mt-2 rounded-lg bg-[#b8552b] px-6 py-3 font-[family-name:var(--font-work-sans)] text-base font-semibold text-white hover:bg-[#8f3f1c] disabled:opacity-60"
+              className="mt-2 rounded-lg bg-[#0f5238] px-6 py-3 font-[family-name:var(--font-work-sans)] text-base font-semibold text-white hover:bg-[#0c4029] disabled:opacity-60"
             >
               {saved ? "Enregistre ✓" : saving ? "Enregistrement..." : "Enregistrer"}
             </button>
@@ -225,7 +225,7 @@ export default function AccountPage() {
             )}
 
             <div className="flex flex-col gap-2">
-              <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33]">
+              <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
                 Desactiver votre compte le rend inaccessible sans le supprimer.
               </p>
               {confirmingDeactivate ? (
@@ -241,7 +241,7 @@ export default function AccountPage() {
                   <button
                     type="button"
                     onClick={() => setConfirmingDeactivate(false)}
-                    className="rounded-lg border border-[#d9c7a3] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33] hover:bg-black/5"
+                    className="rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:bg-black/5"
                   >
                     Annuler
                   </button>
@@ -250,7 +250,7 @@ export default function AccountPage() {
                 <button
                   type="button"
                   onClick={() => setConfirmingDeactivate(true)}
-                  className="w-fit rounded-lg border border-[#d9c7a3] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#4a3f33] hover:bg-black/5"
+                  className="w-fit rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-black/5"
                 >
                   Desactiver mon compte
                 </button>
@@ -258,7 +258,7 @@ export default function AccountPage() {
             </div>
 
             <div className="flex flex-col gap-2 border-t border-[#f0c9c2] pt-4">
-              <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33]">
+              <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
                 Supprimer votre compte est definitif et irreversible.
               </p>
               {confirmingDelete ? (
@@ -274,7 +274,7 @@ export default function AccountPage() {
                   <button
                     type="button"
                     onClick={() => setConfirmingDelete(false)}
-                    className="rounded-lg border border-[#d9c7a3] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#4a3f33] hover:bg-black/5"
+                    className="rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:bg-black/5"
                   >
                     Annuler
                   </button>
