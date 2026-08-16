@@ -73,6 +73,17 @@ export default function DashboardPage() {
   const [savingPhotos, setSavingPhotos] = useState(false);
   const [photosError, setPhotosError] = useState<string | null>(null);
 
+  const [editingDetailsId, setEditingDetailsId] = useState<string | null>(null);
+  const [editEspece, setEditEspece] = useState("");
+  const [editVariete, setEditVariete] = useState("");
+  const [editCategorie, setEditCategorie] = useState<Categorie>("FRUITIER");
+  const [editQuantite, setEditQuantite] = useState(1);
+  const [editPrixUnitaire, setEditPrixUnitaire] = useState(0);
+  const [editVille, setEditVille] = useState("");
+  const [editRegion, setEditRegion] = useState("");
+  const [savingDetails, setSavingDetails] = useState(false);
+  const [detailsError, setDetailsError] = useState<string | null>(null);
+
   const [uploadingCreate, setUploadingCreate] = useState(false);
   const [uploadingEdit, setUploadingEdit] = useState(false);
 
@@ -129,6 +140,41 @@ export default function DashboardPage() {
       setPhotosError(err instanceof ApiError ? err.message : "Mise a jour des photos impossible.");
     } finally {
       setSavingPhotos(false);
+    }
+  }
+
+  function handleStartEditDetails(annonce: MonAnnonce) {
+    setEditEspece(annonce.espece);
+    setEditVariete(annonce.variete ?? "");
+    setEditCategorie(annonce.categorie);
+    setEditQuantite(annonce.quantite);
+    setEditPrixUnitaire(annonce.prixUnitaire);
+    setEditVille(annonce.ville ?? "");
+    setEditRegion(annonce.region ?? "");
+    setDetailsError(null);
+    setEditingDetailsId(annonce.id);
+  }
+
+  async function handleSaveDetails(id: string) {
+    if (!session) return;
+    setSavingDetails(true);
+    setDetailsError(null);
+    try {
+      const updated = await updateAnnonce(session.token, id, {
+        espece: editEspece,
+        variete: editVariete || undefined,
+        categorie: editCategorie,
+        quantite: editQuantite,
+        prixUnitaire: editPrixUnitaire,
+        ville: editVille || undefined,
+        region: editRegion || undefined,
+      });
+      setAnnonces((prev) => prev.map((a) => (a.id === id ? updated : a)));
+      setEditingDetailsId(null);
+    } catch (err) {
+      setDetailsError(err instanceof ApiError ? err.message : "Mise a jour impossible.");
+    } finally {
+      setSavingDetails(false);
     }
   }
 
@@ -476,6 +522,18 @@ export default function DashboardPage() {
                   <button
                     type="button"
                     onClick={() =>
+                      editingDetailsId === annonce.id
+                        ? setEditingDetailsId(null)
+                        : handleStartEditDetails(annonce)
+                    }
+                    className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-black/5"
+                  >
+                    Modifier
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
                       editingPhotosId === annonce.id
                         ? setEditingPhotosId(null)
                         : handleStartEditPhotos(annonce)
@@ -495,6 +553,117 @@ export default function DashboardPage() {
                   </button>
                 </div>
               </div>
+
+              {editingDetailsId === annonce.id && (
+                <div className="flex flex-col gap-4 rounded-lg border border-[#bfc9c1] p-3">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <label className="flex flex-col gap-1.5">
+                      <span className={labelClass}>Espece</span>
+                      <input
+                        type="text"
+                        required
+                        value={editEspece}
+                        onChange={(e) => setEditEspece(e.target.value)}
+                        className={inputClass}
+                      />
+                    </label>
+                    <label className="flex flex-col gap-1.5">
+                      <span className={labelClass}>Variete (optionnel)</span>
+                      <input
+                        type="text"
+                        value={editVariete}
+                        onChange={(e) => setEditVariete(e.target.value)}
+                        className={inputClass}
+                      />
+                    </label>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <label className="flex flex-col gap-1.5">
+                      <span className={labelClass}>Categorie</span>
+                      <select
+                        value={editCategorie}
+                        onChange={(e) => setEditCategorie(e.target.value as Categorie)}
+                        className={inputClass}
+                      >
+                        {categories.map((c) => (
+                          <option key={c.value} value={c.value}>
+                            {c.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="flex flex-col gap-1.5">
+                      <span className={labelClass}>Quantite</span>
+                      <input
+                        type="number"
+                        min={1}
+                        required
+                        value={editQuantite}
+                        onChange={(e) => setEditQuantite(Number(e.target.value))}
+                        className={inputClass}
+                      />
+                    </label>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <label className="flex flex-col gap-1.5">
+                      <span className={labelClass}>Prix unitaire (FCFA)</span>
+                      <input
+                        type="number"
+                        min={0}
+                        required
+                        value={editPrixUnitaire}
+                        onChange={(e) => setEditPrixUnitaire(Number(e.target.value))}
+                        className={inputClass}
+                      />
+                    </label>
+                    <label className="flex flex-col gap-1.5">
+                      <span className={labelClass}>Ville (optionnel)</span>
+                      <input
+                        type="text"
+                        value={editVille}
+                        onChange={(e) => setEditVille(e.target.value)}
+                        className={inputClass}
+                      />
+                    </label>
+                  </div>
+
+                  <label className="flex flex-col gap-1.5">
+                    <span className={labelClass}>Region (optionnel)</span>
+                    <input
+                      type="text"
+                      value={editRegion}
+                      onChange={(e) => setEditRegion(e.target.value)}
+                      className={inputClass}
+                    />
+                  </label>
+
+                  {detailsError && (
+                    <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7a1f14]">
+                      {detailsError}
+                    </p>
+                  )}
+
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      disabled={savingDetails}
+                      onClick={() => handleSaveDetails(annonce.id)}
+                      className="rounded-lg bg-[#0f5238] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#0c4029] disabled:opacity-60"
+                    >
+                      {savingDetails ? "Enregistrement..." : "Enregistrer"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditingDetailsId(null)}
+                      className="rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:bg-black/5"
+                    >
+                      Annuler
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {editingPhotosId === annonce.id && (
                 <div className="flex flex-col gap-2 rounded-lg border border-[#bfc9c1] p-3">
