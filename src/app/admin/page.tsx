@@ -137,6 +137,19 @@ export default function AdminPage() {
     }
   }
 
+  async function handleToggleMiseEnAvant(id: string, miseEnAvant: boolean) {
+    if (!session) return;
+    setAnnonceActionId(id);
+    try {
+      const updated = await updateAnnonce(session.token, id, { miseEnAvant });
+      setAnnonces((prev) => prev.map((a) => (a.id === id ? { ...a, ...updated } : a)));
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Mise a jour impossible.");
+    } finally {
+      setAnnonceActionId(null);
+    }
+  }
+
   async function handleAnnonceDelete(id: string) {
     if (!session) return;
     setAnnonceActionId(id);
@@ -319,6 +332,11 @@ export default function AdminPage() {
                     >
                       {annonceStatutLabels[annonce.statut]}
                     </span>
+                    {annonce.miseEnAvant && (
+                      <span className="whitespace-nowrap rounded-full bg-[#fdf3e0] px-2 py-0.5 font-mono text-xs font-medium text-[#b45309]">
+                        ★ Mise en avant
+                      </span>
+                    )}
                   </div>
                   <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
                     Par {annonce.producteur.nom} ({annonce.producteur.telephone})
@@ -342,6 +360,18 @@ export default function AdminPage() {
                       </option>
                     ))}
                   </select>
+                  <button
+                    type="button"
+                    disabled={annonceActionId === annonce.id}
+                    onClick={() => handleToggleMiseEnAvant(annonce.id, !annonce.miseEnAvant)}
+                    className={`whitespace-nowrap rounded-lg border px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium disabled:opacity-60 ${
+                      annonce.miseEnAvant
+                        ? "border-[#b45309] bg-[#fdf3e0] text-[#b45309] hover:bg-[#fbe8c8]"
+                        : "border-[#bfc9c1] text-[#404943] hover:bg-black/5"
+                    }`}
+                  >
+                    {annonce.miseEnAvant ? "★ Retirer la mise en avant" : "☆ Mettre en avant"}
+                  </button>
                   <button
                     type="button"
                     disabled={annonceActionId === annonce.id}

@@ -394,7 +394,7 @@ export async function createAnnonce(token: string, data: AnnonceInput): Promise<
 export async function updateAnnonce(
   token: string,
   id: string,
-  data: Partial<AnnonceInput> & { statut?: StatutAnnonce }
+  data: Partial<AnnonceInput> & { statut?: StatutAnnonce; miseEnAvant?: boolean }
 ): Promise<MonAnnonce> {
   const res = await fetch(`${API_URL}/api/annonces/${id}`, {
     method: "PATCH",

@@ -438,6 +438,14 @@ export default function DashboardPage() {
                       >
                         {categorieLabels[annonce.categorie]}
                       </span>
+                      {annonce.miseEnAvant && (
+                        <span
+                          title="Mise en avant par l'equipe AgroJi-Tech"
+                          className="whitespace-nowrap rounded-full bg-[#fdf3e0] px-2 py-0.5 font-mono text-xs font-medium text-[#b45309]"
+                        >
+                          ★ Mise en avant
+                        </span>
+                      )}
                     </div>
                     <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
                       {annonce.quantite} en stock · {annonce.prixUnitaire.toLocaleString("fr-FR")} FCFA/unite
