@@ -126,7 +126,7 @@ export type RegisterInput = {
 
 export type RegisterResult = {
   message: string;
-  utilisateur: Pick<Utilisateur, "id" | "nom" | "telephone"> & { email?: string | null; roles: Utilisateur["roles"] };
+  utilisateur: Pick<Utilisateur, "nom" | "telephone"> & { email?: string | null; roles: Utilisateur["roles"] };
 };
 
 export async function register(data: RegisterInput): Promise<RegisterResult> {
