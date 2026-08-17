@@ -161,6 +161,13 @@ export async function verifyAccount(telephone: string, code: string): Promise<Lo
 
 export type StatutCommande = "ENVOYEE" | "ACCEPTEE" | "REFUSEE" | "FINALISEE";
 
+export type CommandeHistoriqueEntry = {
+  id: string;
+  statut: StatutCommande;
+  acteurId: string;
+  createdAt: string;
+};
+
 export type Commande = {
   id: string;
   annonceId: string;
@@ -172,6 +179,7 @@ export type Commande = {
   createdAt: string;
   annonce: Pick<Annonce, "id" | "espece" | "variete" | "prixUnitaire" | "photos">;
   evaluation?: { id: string; note: number; commentaire?: string | null } | null;
+  historique: CommandeHistoriqueEntry[];
 };
 
 export async function createCommande(

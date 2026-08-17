@@ -13,6 +13,7 @@ import {
   type StatutCommande,
 } from "@/lib/api";
 import { getSession, subscribeToAuthChanges } from "@/lib/auth";
+import CommandeTimeline from "@/components/CommandeTimeline";
 
 const statutLabels: Record<StatutCommande, string> = {
   ENVOYEE: "Envoyee",
@@ -194,6 +195,7 @@ export default function OrdersPage() {
                     &laquo;{commande.message}&raquo;
                   </p>
                 )}
+                <CommandeTimeline historique={commande.historique} statutActuel={commande.statut} />
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
