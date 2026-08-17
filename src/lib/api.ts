@@ -844,7 +844,7 @@ export async function deleteMonCompte(token: string): Promise<void> {
   }
 }
 
-export type TypeConversation = "COMMANDE" | "SUPPORT";
+export type TypeConversation = "COMMANDE" | "SUPPORT" | "PRODUIT";
 
 export type ConversationResume = {
   id: string;
@@ -855,6 +855,13 @@ export type ConversationResume = {
     acheteur: { id: string; nom: string };
     producteur: { id: string; nom: string };
   } | null;
+  annonce: {
+    id: string;
+    espece: string;
+    variete?: string | null;
+    producteur: { id: string; nom: string };
+  } | null;
+  acheteur: { id: string; nom: string } | null;
   utilisateur: { id: string; nom: string } | null;
   dernierMessage: { contenu: string; createdAt: string; auteurId: string } | null;
   nonLus: number;
@@ -889,6 +896,23 @@ export async function ouvrirConversationCommande(
   commandeId: string
 ): Promise<{ id: string }> {
   const res = await fetch(`${API_URL}/api/conversations/commande/${commandeId}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible d'ouvrir la conversation", res.status);
+  }
+
+  return body;
+}
+
+export async function ouvrirConversationAnnonce(
+  token: string,
+  annonceId: string
+): Promise<{ id: string }> {
+  const res = await fetch(`${API_URL}/api/conversations/annonce/${annonceId}`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
   });

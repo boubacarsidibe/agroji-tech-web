@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useSyncExternalStore } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { clearSession, getSession, subscribeToAuthChanges } from "@/lib/auth";
 import NotificationBell from "@/components/NotificationBell";
 
@@ -13,114 +13,147 @@ const navLinks = [
   { label: "Support", href: "/support" },
 ];
 
+function isActive(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const session = useSyncExternalStore(
     subscribeToAuthChanges,
     getSession,
     () => null
   );
   const [menuOpen, setMenuOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
 
   const isProducteur = session?.utilisateur.roles.includes("PRODUCTEUR") ?? false;
   const isAdmin = session?.utilisateur.roles.includes("ADMIN") ?? false;
+  const initiale = session?.utilisateur.nom?.trim().charAt(0).toUpperCase() ?? "?";
+
+  const accountLinks = session
+    ? [
+        { label: "Favoris", href: "/favorites" },
+        { label: "Messages", href: "/messages" },
+        ...(isProducteur ? [{ label: "Mes annonces", href: "/dashboard" }] : []),
+        ...(isAdmin ? [{ label: "Admin", href: "/admin" }] : []),
+      ]
+    : [];
 
   function handleLogout() {
     clearSession();
     setMenuOpen(false);
+    setAccountOpen(false);
     router.push("/");
   }
 
   function handleNavClick() {
     setMenuOpen(false);
+    setAccountOpen(false);
   }
 
   return (
-    <header className="flex flex-col border-b border-[#bfc9c1] bg-[#fbf8ff] drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)]">
+    <header className="sticky top-0 z-40 flex flex-col border-b border-white/10 bg-[#232a4a]/95 backdrop-blur-sm">
       <div className="mx-auto flex h-16 w-full max-w-[1280px] items-center justify-between px-4">
         <div className="flex items-center gap-8">
           <Link
             href="/"
-            className="whitespace-nowrap font-sans text-xl font-semibold tracking-[-0.6px] text-[#0f5238] sm:text-2xl"
+            onClick={handleNavClick}
+            className="whitespace-nowrap font-sans text-xl font-semibold tracking-[-0.6px] text-[#b1f0ce] sm:text-2xl"
           >
             AgroJi-Tech
           </Link>
-          <nav className="hidden items-center gap-6 md:flex">
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="whitespace-nowrap px-2 py-1 font-[family-name:var(--font-work-sans)] text-base text-[#404943] hover:text-[#0f5238]"
-              >
-                {link.label}
-              </Link>
-            ))}
+          <nav className="hidden items-center gap-1 md:flex">
+            {navLinks.map((link) => {
+              const active = isActive(pathname, link.href);
+              return (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className={`relative whitespace-nowrap px-3 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium transition-colors ${
+                    active ? "text-[#b1f0ce]" : "text-[#d5d8f9] hover:text-[#b1f0ce]"
+                  }`}
+                >
+                  {link.label}
+                  {active && (
+                    <span className="absolute inset-x-3 -bottom-[1px] h-[2px] rounded-full bg-[#b1f0ce]" />
+                  )}
+                </Link>
+              );
+            })}
           </nav>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex items-center gap-2 sm:gap-3">
           {session && (
-            <div className="hidden items-center gap-1 sm:flex">
+            <div className="hidden text-[#d5d8f9] sm:block">
               <NotificationBell session={session} />
             </div>
           )}
 
-          <div className="hidden items-center gap-3 md:flex">
+          <div className="hidden items-center gap-1 md:flex">
             {session ? (
-              <div className="flex items-center gap-3">
-                <Link
-                  href="/favorites"
-                  className="whitespace-nowrap font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:text-[#0f5238]"
-                >
-                  Favoris
-                </Link>
-                <Link
-                  href="/messages"
-                  className="whitespace-nowrap font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:text-[#0f5238]"
-                >
-                  Messages
-                </Link>
-                {isProducteur && (
+              <>
+                {accountLinks.map((link) => (
                   <Link
-                    href="/dashboard"
-                    className="whitespace-nowrap font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:text-[#0f5238]"
+                    key={link.label}
+                    href={link.href}
+                    className={`whitespace-nowrap px-3 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium transition-colors ${
+                      isActive(pathname, link.href)
+                        ? "text-[#b1f0ce]"
+                        : "text-[#d5d8f9] hover:text-[#b1f0ce]"
+                    }`}
                   >
-                    Mes annonces
+                    {link.label}
                   </Link>
-                )}
-                {isAdmin && (
-                  <Link
-                    href="/admin"
-                    className="whitespace-nowrap font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:text-[#0f5238]"
+                ))}
+
+                <div className="relative ml-2">
+                  <button
+                    type="button"
+                    onClick={() => setAccountOpen((v) => !v)}
+                    aria-expanded={accountOpen}
+                    aria-label="Mon compte"
+                    className="flex size-9 items-center justify-center rounded-full bg-[#b1f0ce] font-mono text-sm font-semibold text-[#002114] hover:bg-[#9de3bc]"
                   >
-                    Admin
-                  </Link>
-                )}
-                <Link
-                  href="/account"
-                  className="whitespace-nowrap font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:text-[#0f5238]"
-                >
-                  {session.utilisateur.nom}
-                </Link>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="whitespace-nowrap rounded-full border border-[#0f5238] px-6 py-2 font-mono text-xs font-medium text-[#0f5238] hover:bg-[#0f5238]/5"
-                >
-                  Logout
-                </button>
-              </div>
+                    {initiale}
+                  </button>
+
+                  {accountOpen && (
+                    <div className="absolute right-0 top-11 z-10 flex w-48 flex-col overflow-hidden rounded-xl border border-white/10 bg-[#2b3252] py-1 shadow-lg">
+                      <span className="truncate px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-white">
+                        {session.utilisateur.nom}
+                      </span>
+                      <Link
+                        href="/account"
+                        onClick={handleNavClick}
+                        className="px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#d5d8f9] hover:bg-white/5 hover:text-[#b1f0ce]"
+                      >
+                        Mon compte
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="px-4 py-2 text-left font-[family-name:var(--font-work-sans)] text-sm text-[#d5d8f9] hover:bg-white/5 hover:text-[#b1f0ce]"
+                      >
+                        Se deconnecter
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
             ) : (
               <div className="flex items-center gap-3">
                 <Link
                   href="/register"
-                  className="whitespace-nowrap font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:text-[#0f5238]"
+                  className="whitespace-nowrap px-3 py-2 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#d5d8f9] hover:text-[#b1f0ce]"
                 >
                   S&apos;inscrire
                 </Link>
                 <Link
                   href="/login"
-                  className="whitespace-nowrap rounded-full bg-[#0f5238] px-6 py-2 font-mono text-xs font-medium text-white drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)] hover:bg-[#0c4029]"
+                  className="whitespace-nowrap rounded-full bg-[#b1f0ce] px-6 py-2 font-[family-name:var(--font-work-sans)] text-sm font-semibold text-[#002114] hover:bg-[#9de3bc]"
                 >
                   Login
                 </Link>
@@ -129,7 +162,7 @@ export default function Header() {
           </div>
 
           {session && (
-            <div className="sm:hidden">
+            <div className="text-[#d5d8f9] sm:hidden">
               <NotificationBell session={session} />
             </div>
           )}
@@ -139,14 +172,14 @@ export default function Header() {
             aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((v) => !v)}
-            className="flex size-10 items-center justify-center rounded-full hover:bg-black/5 md:hidden"
+            className="flex size-10 items-center justify-center rounded-full text-[#d5d8f9] hover:bg-white/10 md:hidden"
           >
             {menuOpen ? (
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#171c19" strokeWidth="2">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
               </svg>
             ) : (
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#171c19" strokeWidth="2">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
               </svg>
             )}
@@ -155,13 +188,17 @@ export default function Header() {
       </div>
 
       {menuOpen && (
-        <nav className="flex flex-col gap-1 border-t border-[#bfc9c1] px-4 py-3 md:hidden">
+        <nav className="flex flex-col gap-1 border-t border-white/10 px-4 py-3 md:hidden">
           {navLinks.map((link) => (
             <Link
               key={link.label}
               href={link.href}
               onClick={handleNavClick}
-              className="rounded-lg px-3 py-2.5 font-[family-name:var(--font-work-sans)] text-base text-[#404943] hover:bg-black/5"
+              className={`rounded-lg px-3 py-2.5 font-[family-name:var(--font-work-sans)] text-base ${
+                isActive(pathname, link.href)
+                  ? "bg-white/5 text-[#b1f0ce]"
+                  : "text-[#d5d8f9] hover:bg-white/5 hover:text-[#b1f0ce]"
+              }`}
             >
               {link.label}
             </Link>
@@ -169,50 +206,35 @@ export default function Header() {
 
           {session ? (
             <>
-              <Link
-                href="/favorites"
-                onClick={handleNavClick}
-                className="rounded-lg px-3 py-2.5 font-[family-name:var(--font-work-sans)] text-base text-[#404943] hover:bg-black/5"
-              >
-                Favoris
-              </Link>
-              <Link
-                href="/messages"
-                onClick={handleNavClick}
-                className="rounded-lg px-3 py-2.5 font-[family-name:var(--font-work-sans)] text-base text-[#404943] hover:bg-black/5"
-              >
-                Messages
-              </Link>
-              {isProducteur && (
+              {accountLinks.map((link) => (
                 <Link
-                  href="/dashboard"
+                  key={link.label}
+                  href={link.href}
                   onClick={handleNavClick}
-                  className="rounded-lg px-3 py-2.5 font-[family-name:var(--font-work-sans)] text-base text-[#404943] hover:bg-black/5"
+                  className={`rounded-lg px-3 py-2.5 font-[family-name:var(--font-work-sans)] text-base ${
+                    isActive(pathname, link.href)
+                      ? "bg-white/5 text-[#b1f0ce]"
+                      : "text-[#d5d8f9] hover:bg-white/5 hover:text-[#b1f0ce]"
+                  }`}
                 >
-                  Mes annonces
+                  {link.label}
                 </Link>
-              )}
-              {isAdmin && (
-                <Link
-                  href="/admin"
-                  onClick={handleNavClick}
-                  className="rounded-lg px-3 py-2.5 font-[family-name:var(--font-work-sans)] text-base text-[#404943] hover:bg-black/5"
-                >
-                  Admin
-                </Link>
-              )}
-              <div className="mt-2 flex items-center justify-between border-t border-[#eef3ef] px-3 pt-3">
+              ))}
+              <div className="mt-2 flex items-center justify-between border-t border-white/10 px-3 pt-3">
                 <Link
                   href="/account"
                   onClick={handleNavClick}
-                  className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:text-[#0f5238]"
+                  className="flex items-center gap-2 font-[family-name:var(--font-work-sans)] text-sm text-[#d5d8f9] hover:text-[#b1f0ce]"
                 >
+                  <span className="flex size-7 items-center justify-center rounded-full bg-[#b1f0ce] font-mono text-xs font-semibold text-[#002114]">
+                    {initiale}
+                  </span>
                   {session.utilisateur.nom}
                 </Link>
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="whitespace-nowrap rounded-full border border-[#0f5238] px-5 py-1.5 font-mono text-xs font-medium text-[#0f5238] hover:bg-[#0f5238]/5"
+                  className="whitespace-nowrap rounded-full border border-[#b1f0ce] px-5 py-1.5 font-mono text-xs font-medium text-[#b1f0ce] hover:bg-white/5"
                 >
                   Logout
                 </button>
@@ -223,14 +245,14 @@ export default function Header() {
               <Link
                 href="/register"
                 onClick={handleNavClick}
-                className="rounded-lg border border-[#0f5238] px-3 py-2.5 text-center font-mono text-sm font-medium text-[#0f5238] hover:bg-[#0f5238]/5"
+                className="rounded-lg border border-[#b1f0ce] px-3 py-2.5 text-center font-mono text-sm font-medium text-[#b1f0ce] hover:bg-white/5"
               >
                 S&apos;inscrire
               </Link>
               <Link
                 href="/login"
                 onClick={handleNavClick}
-                className="rounded-lg bg-[#0f5238] px-3 py-2.5 text-center font-mono text-sm font-medium text-white hover:bg-[#0c4029]"
+                className="rounded-lg bg-[#b1f0ce] px-3 py-2.5 text-center font-mono text-sm font-semibold text-[#002114] hover:bg-[#9de3bc]"
               >
                 Login
               </Link>

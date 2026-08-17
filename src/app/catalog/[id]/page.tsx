@@ -8,6 +8,7 @@ import {
   createSignalement,
   getAnnonce,
   listEvaluationsPourUtilisateur,
+  ouvrirConversationAnnonce,
   ApiError,
   type AnnonceDetail,
   type EvaluationAvecAuteur,
@@ -58,6 +59,9 @@ export default function AnnonceDetailPage() {
   const [orderLoading, setOrderLoading] = useState(false);
   const [orderError, setOrderError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
+
+  const [contacting, setContacting] = useState(false);
+  const [contactError, setContactError] = useState<string | null>(null);
 
   const [reporting, setReporting] = useState(false);
   const [raison, setRaison] = useState("");
@@ -124,6 +128,23 @@ export default function AnnonceDetailPage() {
       setOrderError(err instanceof ApiError ? err.message : "Impossible d'envoyer la demande.");
     } finally {
       setOrderLoading(false);
+    }
+  }
+
+  async function handleContacter() {
+    if (!session) {
+      router.push("/login");
+      return;
+    }
+    if (!annonce) return;
+    setContacting(true);
+    setContactError(null);
+    try {
+      const conversation = await ouvrirConversationAnnonce(session.token, annonce.id);
+      router.push(`/messages/${conversation.id}`);
+    } catch (err) {
+      setContactError(err instanceof ApiError ? err.message : "Impossible d'ouvrir la conversation.");
+      setContacting(false);
     }
   }
 
@@ -286,6 +307,23 @@ export default function AnnonceDetailPage() {
               </span>
             </div>
           </Link>
+
+          {(!session || session.utilisateur.id !== annonce.producteur.id) && (
+            <button
+              type="button"
+              onClick={handleContacter}
+              disabled={contacting}
+              className="flex items-center justify-center gap-2 rounded-lg border border-[#0f5238] px-4 py-2.5 font-[family-name:var(--font-work-sans)] text-sm font-semibold text-[#0f5238] hover:bg-[#e3f3ea] disabled:opacity-60"
+            >
+              {contacting ? "Ouverture..." : "Contacter le producteur"}
+            </button>
+          )}
+
+          {contactError && (
+            <p className="rounded-lg bg-[#fdecea] px-4 py-3 font-[family-name:var(--font-work-sans)] text-sm text-[#7a1f14]">
+              {contactError}
+            </p>
+          )}
 
           {orderError && (
             <p className="rounded-lg bg-[#fdecea] px-4 py-3 font-[family-name:var(--font-work-sans)] text-sm text-[#7a1f14]">

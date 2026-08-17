@@ -24,6 +24,14 @@ function titre(conversation: ConversationResume | null, monId: string): string {
       : "Support AgroJi-Tech";
   }
 
+  if (conversation.type === "PRODUIT") {
+    if (!conversation.annonce || !conversation.acheteur) return "Annonce";
+    const autre =
+      conversation.acheteur.id === monId ? conversation.annonce.producteur : conversation.acheteur;
+    const { espece, variete } = conversation.annonce;
+    return `${autre.nom} · ${espece}${variete ? ` (${variete})` : ""}`;
+  }
+
   if (!conversation.commande) return "Commande";
   const autre =
     conversation.commande.acheteur.id === monId

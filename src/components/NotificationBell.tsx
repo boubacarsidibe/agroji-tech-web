@@ -130,7 +130,7 @@ export default function NotificationBell({ session }: { session: Session }) {
         type="button"
         aria-label="Notifications"
         onClick={() => setOpen((v) => !v)}
-        className="relative flex size-10 items-center justify-center rounded-full hover:bg-black/5"
+        className="relative flex size-10 items-center justify-center rounded-full hover:bg-white/10"
       >
         <Image src="/icons/bell.svg" alt="" width={16} height={20} />
         {unreadCount > 0 && (
