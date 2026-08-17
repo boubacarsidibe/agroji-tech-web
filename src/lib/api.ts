@@ -433,6 +433,29 @@ export async function listMesAnnonces(token: string): Promise<MonAnnonce[]> {
   return body as MonAnnonce[];
 }
 
+export type ProducteurStats = {
+  vuesTotal: number;
+  commandesParStatut: Record<StatutCommande, number>;
+  tauxConversion: number;
+  revenuTotal: number;
+  revenuParMois: { mois: string; revenu: number }[];
+  topAnnonces: { id: string; espece: string; variete?: string | null; vues: number; nombreCommandes: number }[];
+};
+
+export async function getProducteurStats(token: string): Promise<ProducteurStats> {
+  const res = await fetch(`${API_URL}/api/annonces/stats`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible de charger les statistiques", res.status);
+  }
+
+  return body as ProducteurStats;
+}
+
 export async function createAnnonce(token: string, data: AnnonceInput): Promise<MonAnnonce> {
   const res = await fetch(`${API_URL}/api/annonces`, {
     method: "POST",

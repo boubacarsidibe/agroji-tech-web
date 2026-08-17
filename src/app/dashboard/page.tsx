@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import {
   createAnnonce,
   deleteAnnonce,
+  getProducteurStats,
   listMesAnnonces,
   updateAnnonce,
   uploadPhoto,
   ApiError,
   type Categorie,
   type MonAnnonce,
+  type ProducteurStats,
   type StatutAnnonce,
 } from "@/lib/api";
 import { getSession, subscribeToAuthChanges } from "@/lib/auth";
@@ -55,6 +57,7 @@ export default function DashboardPage() {
   const [annonces, setAnnonces] = useState<MonAnnonce[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [stats, setStats] = useState<ProducteurStats | null>(null);
   const [actionId, setActionId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
@@ -198,6 +201,9 @@ export default function DashboardPage() {
         .then(setAnnonces)
         .catch(() => setError("Impossible de charger vos annonces pour le moment."))
         .finally(() => setLoading(false));
+      getProducteurStats(session.token)
+        .then(setStats)
+        .catch(() => {});
     }, 0);
 
     return () => clearTimeout(timeout);
@@ -297,6 +303,76 @@ export default function DashboardPage() {
           {showForm ? "Annuler" : "Nouvelle annonce"}
         </button>
       </div>
+
+      {stats && (
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {[
+              {
+                label: "Vues cumulees",
+                value: stats.vuesTotal.toLocaleString("fr-FR"),
+                bg: "bg-[#e8f0fe]",
+                text: "text-[#1d4ed8]",
+                bar: "bg-[#3b6fe0]",
+              },
+              {
+                label: "Taux de conversion",
+                value: `${stats.tauxConversion}%`,
+                bg: "bg-[#fdf3e0]",
+                text: "text-[#b45309]",
+                bar: "bg-[#e8973f]",
+              },
+              {
+                label: "Commandes finalisees",
+                value: stats.commandesParStatut.FINALISEE,
+                bg: "bg-[#e3f3ea]",
+                text: "text-[#0f5238]",
+                bar: "bg-[#2d6a4f]",
+              },
+              {
+                label: "Revenu total",
+                value: `${stats.revenuTotal.toLocaleString("fr-FR")} FCFA`,
+                bg: "bg-[#f3e8fd]",
+                text: "text-[#6b21a8]",
+                bar: "bg-[#9747d1]",
+              },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className={`flex flex-col gap-1 overflow-hidden rounded-xl border border-[#dfe3e0] ${stat.bg} p-4`}
+              >
+                <div className={`-mx-4 -mt-4 mb-1 h-1.5 w-[calc(100%+2rem)] ${stat.bar}`} />
+                <span className={`font-sans text-2xl font-bold ${stat.text}`}>{stat.value}</span>
+                <span className="font-[family-name:var(--font-work-sans)] text-sm text-[#404943]">
+                  {stat.label}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {stats.topAnnonces.length > 0 && (
+            <div className="flex flex-col gap-2 rounded-xl border border-[#dfe3e0] bg-white p-4">
+              <h2 className="font-sans text-base font-semibold text-[#171c19]">
+                Annonces les plus demandees
+              </h2>
+              <div className="flex flex-col gap-2">
+                {stats.topAnnonces.map((a) => (
+                  <div key={a.id} className="flex items-center justify-between gap-3">
+                    <span className="font-[family-name:var(--font-work-sans)] text-sm text-[#171c19]">
+                      {a.espece}
+                      {a.variete ? ` · ${a.variete}` : ""}
+                    </span>
+                    <span className="whitespace-nowrap font-[family-name:var(--font-work-sans)] text-xs text-[#7c8a80]">
+                      {a.nombreCommandes} commande{a.nombreCommandes > 1 ? "s" : ""} · {a.vues} vue
+                      {a.vues > 1 ? "s" : ""}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {showForm && (
         <form
