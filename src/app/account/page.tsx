@@ -12,6 +12,7 @@ import {
   type MonProfil,
 } from "@/lib/api";
 import { clearSession, getSession, subscribeToAuthChanges } from "@/lib/auth";
+import LocationPicker, { type LatLng } from "@/components/LocationPicker";
 
 const inputClass =
   "rounded-lg border border-[#bfc9c1] px-4 py-2.5 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]";
@@ -29,6 +30,7 @@ export default function AccountPage() {
   const [description, setDescription] = useState("");
   const [ville, setVille] = useState("");
   const [region, setRegion] = useState("");
+  const [position, setPosition] = useState<LatLng | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -61,6 +63,11 @@ export default function AccountPage() {
           setDescription(p.description ?? "");
           setVille(p.ville ?? "");
           setRegion(p.region ?? "");
+          setPosition(
+            p.latitude != null && p.longitude != null
+              ? { latitude: p.latitude, longitude: p.longitude }
+              : null
+          );
         })
         .catch(() => setError("Impossible de charger votre profil."))
         .finally(() => setLoading(false));
@@ -81,6 +88,8 @@ export default function AccountPage() {
         description: description || undefined,
         ville: ville || undefined,
         region: region || undefined,
+        latitude: position?.latitude,
+        longitude: position?.longitude,
       });
       setProfil((prev) => (prev ? { ...prev, ...updated } : prev));
       setSaved(true);
@@ -225,6 +234,13 @@ export default function AccountPage() {
                 />
               </label>
             )}
+
+            <div className="flex flex-col gap-1.5">
+              <p className="font-[family-name:var(--font-work-sans)] text-xs text-[#7c8a80]">
+                Renseignez votre position pour estimer les frais de livraison sur vos commandes.
+              </p>
+              <LocationPicker value={position} onChange={setPosition} />
+            </div>
 
             {saveError && (
               <p className="rounded-lg bg-[#fdecea] px-4 py-3 font-[family-name:var(--font-work-sans)] text-sm text-[#7a1f14]">

@@ -180,6 +180,8 @@ export type Commande = {
   annonce: Pick<Annonce, "id" | "espece" | "variete" | "prixUnitaire" | "photos">;
   evaluation?: { id: string; note: number; commentaire?: string | null } | null;
   historique: CommandeHistoriqueEntry[];
+  distanceLivraisonKm?: number | null;
+  fraisLivraison?: number | null;
 };
 
 export async function createCommande(
@@ -770,6 +772,8 @@ export async function deleteRecherche(token: string, id: string): Promise<void> 
 export type MonProfil = Producteur & {
   telephone: string;
   email?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
 export type UpdateProfilInput = {
@@ -778,6 +782,8 @@ export type UpdateProfilInput = {
   description?: string;
   ville?: string;
   region?: string;
+  latitude?: number;
+  longitude?: number;
 };
 
 export async function getMonProfil(token: string): Promise<MonProfil> {

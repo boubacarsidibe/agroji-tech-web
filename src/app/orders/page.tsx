@@ -187,6 +187,18 @@ export default function OrdersPage() {
                 <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
                   Quantite: {commande.quantiteDemandee} · {commande.annonce.prixUnitaire.toLocaleString("fr-FR")} FCFA/unite
                 </p>
+                {commande.fraisLivraison != null ? (
+                  <p className="font-[family-name:var(--font-work-sans)] text-xs text-[#7c8a80]">
+                    Livraison estimee: {commande.fraisLivraison.toLocaleString("fr-FR")} FCFA
+                    {commande.distanceLivraisonKm != null
+                      ? ` (${commande.distanceLivraisonKm.toFixed(1)} km)`
+                      : ""}
+                  </p>
+                ) : (
+                  <p className="font-[family-name:var(--font-work-sans)] text-xs text-[#7c8a80]">
+                    Frais de livraison a convenir avec le producteur
+                  </p>
+                )}
                 <p className="font-[family-name:var(--font-work-sans)] text-xs text-[#7c8a80]">
                   Commande le {formatDate(commande.createdAt)}
                 </p>
