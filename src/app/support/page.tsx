@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import ContacterSupport from "@/components/ContacterSupport";
 
 export const metadata: Metadata = {
   title: "Centre d'aide",
@@ -91,8 +92,9 @@ export default function SupportPage() {
           <Link href="/contact" className="font-medium text-[#0f5238] hover:underline">
             Contact
           </Link>
-          .
+          , ou en direct via le chat ci-dessous.
         </p>
+        <ContacterSupport />
       </div>
     </div>
   );

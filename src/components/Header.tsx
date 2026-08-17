@@ -74,6 +74,12 @@ export default function Header() {
                 >
                   Favoris
                 </Link>
+                <Link
+                  href="/messages"
+                  className="whitespace-nowrap font-[family-name:var(--font-work-sans)] text-sm text-[#404943] hover:text-[#0f5238]"
+                >
+                  Messages
+                </Link>
                 {isProducteur && (
                   <Link
                     href="/dashboard"
@@ -169,6 +175,13 @@ export default function Header() {
                 className="rounded-lg px-3 py-2.5 font-[family-name:var(--font-work-sans)] text-base text-[#404943] hover:bg-black/5"
               >
                 Favoris
+              </Link>
+              <Link
+                href="/messages"
+                onClick={handleNavClick}
+                className="rounded-lg px-3 py-2.5 font-[family-name:var(--font-work-sans)] text-base text-[#404943] hover:bg-black/5"
+              >
+                Messages
               </Link>
               {isProducteur && (
                 <Link

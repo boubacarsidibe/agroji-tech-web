@@ -19,6 +19,7 @@ const typeLabels: Record<TypeNotification, string> = {
   MISE_A_JOUR_COMMANDE: "Commande",
   MESSAGE: "Information",
   ALERTE_RECHERCHE: "Alerte recherche",
+  NOUVEAU_MESSAGE: "Message",
 };
 
 const typeColors: Record<TypeNotification, string> = {
@@ -26,6 +27,7 @@ const typeColors: Record<TypeNotification, string> = {
   MISE_A_JOUR_COMMANDE: "bg-[#e8f0fe] text-[#1d4ed8]",
   MESSAGE: "bg-[#eef3ef] text-[#404943]",
   ALERTE_RECHERCHE: "bg-[#fdf3e0] text-[#b45309]",
+  NOUVEAU_MESSAGE: "bg-[#e3f3ea] text-[#0f5238]",
 };
 
 // Notifications don't yet carry a stored deep link, so route by type: the
@@ -36,6 +38,7 @@ const typeDestination: Partial<Record<TypeNotification, string>> = {
   NOUVELLE_DEMANDE: "/orders",
   MISE_A_JOUR_COMMANDE: "/orders",
   ALERTE_RECHERCHE: "/catalog",
+  NOUVEAU_MESSAGE: "/messages",
 };
 
 function timeAgo(iso: string): string {

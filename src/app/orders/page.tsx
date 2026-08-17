@@ -6,6 +6,7 @@ import Link from "next/link";
 import {
   createEvaluation,
   listCommandes,
+  ouvrirConversationCommande,
   updateCommandeStatut,
   ApiError,
   type Commande,
@@ -82,6 +83,16 @@ export default function OrdersPage() {
       setError(err instanceof ApiError ? err.message : "Mise a jour impossible.");
     } finally {
       setActionId(null);
+    }
+  }
+
+  async function handleDiscuter(commandeId: string) {
+    if (!session) return;
+    try {
+      const conversation = await ouvrirConversationCommande(session.token, commandeId);
+      router.push(`/messages/${conversation.id}`);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Impossible d'ouvrir la conversation.");
     }
   }
 
@@ -191,6 +202,14 @@ export default function OrdersPage() {
                 >
                   {statutLabels[commande.statut]}
                 </span>
+
+                <button
+                  type="button"
+                  onClick={() => handleDiscuter(commande.id)}
+                  className="rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-black/5"
+                >
+                  Discuter
+                </button>
 
                 {role === "producteur" && commande.statut === "ENVOYEE" && (
                   <div className="flex gap-2">

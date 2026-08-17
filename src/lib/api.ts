@@ -473,7 +473,8 @@ export type TypeNotification =
   | "MESSAGE"
   | "NOUVELLE_DEMANDE"
   | "MISE_A_JOUR_COMMANDE"
-  | "ALERTE_RECHERCHE";
+  | "ALERTE_RECHERCHE"
+  | "NOUVEAU_MESSAGE";
 
 export type Notification = {
   id: string;
@@ -840,5 +841,121 @@ export async function deleteMonCompte(token: string): Promise<void> {
   const body = await res.json().catch(() => ({}));
   if (!res.ok) {
     throw new ApiError(body.error ?? "Suppression impossible", res.status);
+  }
+}
+
+export type TypeConversation = "COMMANDE" | "SUPPORT";
+
+export type ConversationResume = {
+  id: string;
+  type: TypeConversation;
+  commande: {
+    id: string;
+    annonce: { espece: string; variete?: string | null };
+    acheteur: { id: string; nom: string };
+    producteur: { id: string; nom: string };
+  } | null;
+  utilisateur: { id: string; nom: string } | null;
+  dernierMessage: { contenu: string; createdAt: string; auteurId: string } | null;
+  nonLus: number;
+  updatedAt: string;
+};
+
+export type ChatMessage = {
+  id: string;
+  conversationId: string;
+  contenu: string;
+  lu: boolean;
+  createdAt: string;
+  auteur: { id: string; nom: string };
+};
+
+export async function listConversations(token: string): Promise<ConversationResume[]> {
+  const res = await fetch(`${API_URL}/api/conversations`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible de charger vos conversations", res.status);
+  }
+
+  return body as ConversationResume[];
+}
+
+export async function ouvrirConversationCommande(
+  token: string,
+  commandeId: string
+): Promise<{ id: string }> {
+  const res = await fetch(`${API_URL}/api/conversations/commande/${commandeId}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible d'ouvrir la conversation", res.status);
+  }
+
+  return body;
+}
+
+export async function ouvrirConversationSupport(token: string): Promise<{ id: string }> {
+  const res = await fetch(`${API_URL}/api/conversations/support`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible d'ouvrir la conversation", res.status);
+  }
+
+  return body;
+}
+
+export async function listMessages(token: string, conversationId: string): Promise<ChatMessage[]> {
+  const res = await fetch(`${API_URL}/api/conversations/${conversationId}/messages`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible de charger les messages", res.status);
+  }
+
+  return body as ChatMessage[];
+}
+
+export async function envoyerMessage(
+  token: string,
+  conversationId: string,
+  contenu: string
+): Promise<ChatMessage> {
+  const res = await fetch(`${API_URL}/api/conversations/${conversationId}/messages`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ contenu }),
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible d'envoyer le message", res.status);
+  }
+
+  return body as ChatMessage;
+}
+
+export async function marquerConversationLue(token: string, conversationId: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/conversations/${conversationId}/lues`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Mise a jour impossible", res.status);
   }
 }
