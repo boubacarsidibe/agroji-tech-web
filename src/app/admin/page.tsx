@@ -71,7 +71,7 @@ export default function AdminPage() {
   const [annonceActionId, setAnnonceActionId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (session === null) router.push("/login");
+    if (session === null) router.push("/admin/login");
     else if (!isAdmin) router.push("/");
   }, [session, isAdmin, router]);
 

@@ -21,7 +21,7 @@ export default function LoginPage() {
     try {
       const result = await login(telephone, motDePasse);
       saveSession(result);
-      router.push("/");
+      router.push(result.utilisateur.roles.includes("ADMIN") ? "/admin" : "/");
     } catch (err) {
       setError(
         err instanceof ApiError ? err.message : "Connexion impossible pour le moment."

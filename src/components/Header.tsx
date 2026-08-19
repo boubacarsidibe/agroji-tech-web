@@ -32,20 +32,24 @@ export default function Header() {
   const isAdmin = session?.utilisateur.roles.includes("ADMIN") ?? false;
   const initiale = session?.utilisateur.nom?.trim().charAt(0).toUpperCase() ?? "?";
 
-  const accountLinks = session
-    ? [
-        { label: "Favoris", href: "/favorites" },
-        { label: "Messages", href: "/messages" },
-        ...(isProducteur ? [{ label: "Mes annonces", href: "/dashboard" }] : []),
-        ...(isAdmin ? [{ label: "Admin", href: "/admin" }] : []),
-      ]
-    : [];
+  // Un administrateur n'a pas de compte marketplace : pas de catalogue, favoris,
+  // messages ni commandes a afficher, uniquement l'acces au tableau de bord.
+  const displayedNavLinks = isAdmin ? [] : navLinks;
+  const accountLinks = !session
+    ? []
+    : isAdmin
+      ? [{ label: "Administration", href: "/admin" }]
+      : [
+          { label: "Favoris", href: "/favorites" },
+          { label: "Messages", href: "/messages" },
+          ...(isProducteur ? [{ label: "Mes annonces", href: "/dashboard" }] : []),
+        ];
 
   function handleLogout() {
     clearSession();
     setMenuOpen(false);
     setAccountOpen(false);
-    router.push("/");
+    router.push(isAdmin ? "/admin/login" : "/");
   }
 
   function handleNavClick() {
@@ -65,7 +69,7 @@ export default function Header() {
             AgroJi-Tech
           </Link>
           <nav className="hidden items-center gap-1 md:flex">
-            {navLinks.map((link) => {
+            {displayedNavLinks.map((link) => {
               const active = isActive(pathname, link.href);
               return (
                 <Link
@@ -189,7 +193,7 @@ export default function Header() {
 
       {menuOpen && (
         <nav className="flex flex-col gap-1 border-t border-white/10 px-4 py-3 md:hidden">
-          {navLinks.map((link) => (
+          {displayedNavLinks.map((link) => (
             <Link
               key={link.label}
               href={link.href}
