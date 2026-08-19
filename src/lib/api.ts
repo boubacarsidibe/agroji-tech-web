@@ -216,7 +216,7 @@ export async function listCommandes(
     throw new ApiError(body.error ?? "Impossible de charger les commandes", res.status);
   }
 
-  return body as Commande[];
+  return (body.resultats ?? []) as Commande[];
 }
 
 export async function updateCommandeStatut(
@@ -528,7 +528,7 @@ export async function listNotifications(token: string): Promise<Notification[]> 
     throw new ApiError(body.error ?? "Impossible de charger les notifications", res.status);
   }
 
-  return body as Notification[];
+  return (body.resultats ?? []) as Notification[];
 }
 
 export async function markNotificationAsRead(token: string, id: string): Promise<Notification> {
@@ -556,6 +556,13 @@ export async function markAllNotificationsAsRead(token: string): Promise<void> {
     throw new ApiError(body.error ?? "Mise a jour impossible", res.status);
   }
 }
+
+export type Paginated<T> = {
+  total: number;
+  page: number;
+  limite: number;
+  resultats: T[];
+};
 
 export type AdminDashboard = {
   utilisateurs: number;
@@ -593,10 +600,12 @@ export type Signalement = {
 
 export async function listSignalements(
   token: string,
-  statut?: StatutSignalement
-): Promise<Signalement[]> {
-  const query = statut ? `?statut=${statut}` : "";
-  const res = await fetch(`${API_URL}/api/admin/signalements${query}`, {
+  statut?: StatutSignalement,
+  page = 1
+): Promise<Paginated<Signalement>> {
+  const query = new URLSearchParams({ page: String(page) });
+  if (statut) query.set("statut", statut);
+  const res = await fetch(`${API_URL}/api/admin/signalements?${query.toString()}`, {
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
   });
@@ -606,7 +615,7 @@ export async function listSignalements(
     throw new ApiError(body.error ?? "Impossible de charger les signalements", res.status);
   }
 
-  return body as Signalement[];
+  return body as Paginated<Signalement>;
 }
 
 export async function traiterSignalement(
@@ -634,10 +643,12 @@ export type AnnonceAdmin = MonAnnonce & {
 
 export async function listToutesAnnonces(
   token: string,
-  statut?: StatutAnnonce
-): Promise<AnnonceAdmin[]> {
-  const query = statut ? `?statut=${statut}` : "";
-  const res = await fetch(`${API_URL}/api/admin/annonces${query}`, {
+  statut?: StatutAnnonce,
+  page = 1
+): Promise<Paginated<AnnonceAdmin>> {
+  const query = new URLSearchParams({ page: String(page) });
+  if (statut) query.set("statut", statut);
+  const res = await fetch(`${API_URL}/api/admin/annonces?${query.toString()}`, {
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
   });
@@ -647,7 +658,31 @@ export async function listToutesAnnonces(
     throw new ApiError(body.error ?? "Impossible de charger les annonces", res.status);
   }
 
-  return body as AnnonceAdmin[];
+  return body as Paginated<AnnonceAdmin>;
+}
+
+export type AuditLog = {
+  id: string;
+  action: string;
+  cible?: string | null;
+  cibleId?: string | null;
+  details?: Record<string, unknown> | null;
+  createdAt: string;
+  admin: { id: string; nom: string };
+};
+
+export async function listAuditLogs(token: string, page = 1): Promise<Paginated<AuditLog>> {
+  const res = await fetch(`${API_URL}/api/admin/audit-logs?page=${page}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible de charger l'historique d'audit", res.status);
+  }
+
+  return body as Paginated<AuditLog>;
 }
 
 export async function archiverAnnonceAdmin(token: string, id: string): Promise<void> {
@@ -738,7 +773,8 @@ export async function listEvaluationsPourUtilisateur(
     throw new Error(`Echec du chargement des evaluations (${res.status})`);
   }
 
-  return res.json();
+  const body = await res.json();
+  return (body.resultats ?? []) as EvaluationAvecAuteur[];
 }
 
 export type RechercheSauvegardee = {
@@ -987,7 +1023,7 @@ export async function listMessages(token: string, conversationId: string): Promi
     throw new ApiError(body.error ?? "Impossible de charger les messages", res.status);
   }
 
-  return body as ChatMessage[];
+  return (body.resultats ?? []) as ChatMessage[];
 }
 
 export async function envoyerMessage(
