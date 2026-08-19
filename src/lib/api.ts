@@ -721,6 +721,73 @@ export async function verifierUtilisateur(token: string, id: string): Promise<vo
   }
 }
 
+export async function reactiverUtilisateur(token: string, id: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/admin/utilisateurs/${id}/reactiver`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Reactivation impossible", res.status);
+  }
+}
+
+export async function deleteEvaluationAdmin(token: string, id: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/admin/evaluations/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Suppression impossible", res.status);
+  }
+}
+
+export type AdminUser = {
+  id: string;
+  nom: string;
+  telephone: string;
+  email?: string | null;
+  roles: Utilisateur["roles"];
+  region?: string | null;
+  ville?: string | null;
+  verifie: boolean;
+  actif: boolean;
+  createdAt: string;
+};
+
+export type ListAdminUsersParams = {
+  role?: "PRODUCTEUR" | "ACHETEUR" | "ADMIN";
+  region?: string;
+  actif?: boolean;
+  q?: string;
+  page?: number;
+};
+
+export async function listAdminUsers(
+  token: string,
+  params: ListAdminUsersParams
+): Promise<Paginated<AdminUser>> {
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== "") query.set(key, String(value));
+  }
+
+  const res = await fetch(`${API_URL}/api/admin/utilisateurs?${query.toString()}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(body.error ?? "Impossible de charger les utilisateurs", res.status);
+  }
+
+  return body as Paginated<AdminUser>;
+}
+
 export async function searchAnnonces(
   params: SearchAnnoncesParams
 ): Promise<SearchAnnoncesResult> {

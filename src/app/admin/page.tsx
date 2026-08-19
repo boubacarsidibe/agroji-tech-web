@@ -5,20 +5,24 @@ import { useRouter } from "next/navigation";
 import {
   archiverAnnonceAdmin,
   deleteAnnonce,
+  deleteEvaluationAdmin,
   getAdminDashboard,
+  listAdminUsers,
   listAuditLogs,
+  listEvaluationsPourUtilisateur,
   listSignalements,
   listToutesAnnonces,
-  listUtilisateurs,
+  reactiverUtilisateur,
   suspendreUtilisateur,
   traiterSignalement,
   updateAnnonce,
   verifierUtilisateur,
   ApiError,
   type AdminDashboard,
+  type AdminUser,
   type AnnonceAdmin,
   type AuditLog,
-  type Producteur,
+  type EvaluationAvecAuteur,
   type Signalement,
   type StatutAnnonce,
   type StatutSignalement,
@@ -54,7 +58,9 @@ const auditActionLabels: Record<string, string> = {
   TRAITER_SIGNALEMENT: "Signalement traite",
   ARCHIVER_ANNONCE: "Annonce archivee",
   SUSPENDRE_UTILISATEUR: "Utilisateur suspendu",
+  REACTIVER_UTILISATEUR: "Utilisateur reactive",
   VERIFIER_UTILISATEUR: "Utilisateur verifie",
+  SUPPRIMER_EVALUATION: "Avis supprime",
 };
 
 function Pager({
@@ -110,12 +116,19 @@ export default function AdminPage() {
   const [error, setError] = useState<string | null>(null);
   const [actionId, setActionId] = useState<string | null>(null);
 
-  const [utilisateurs, setUtilisateurs] = useState<Producteur[]>([]);
+  const [utilisateurs, setUtilisateurs] = useState<AdminUser[]>([]);
   const [utilisateursTotal, setUtilisateursTotal] = useState(0);
   const [utilisateursPage, setUtilisateursPage] = useState(1);
   const [roleFiltre, setRoleFiltre] = useState<"" | "PRODUCTEUR" | "ACHETEUR">("");
+  const [actifFiltre, setActifFiltre] = useState<"" | "true" | "false">("");
+  const [qUtilisateur, setQUtilisateur] = useState("");
   const [usersLoading, setUsersLoading] = useState(true);
   const [userActionId, setUserActionId] = useState<string | null>(null);
+
+  const [evaluationsOuvertesPour, setEvaluationsOuvertesPour] = useState<string | null>(null);
+  const [evaluations, setEvaluations] = useState<EvaluationAvecAuteur[]>([]);
+  const [evaluationsLoading, setEvaluationsLoading] = useState(false);
+  const [evaluationActionId, setEvaluationActionId] = useState<string | null>(null);
 
   const [annonces, setAnnonces] = useState<AnnonceAdmin[]>([]);
   const [annoncesTotal, setAnnoncesTotal] = useState(0);
@@ -165,17 +178,22 @@ export default function AdminPage() {
 
     const timeout = setTimeout(() => {
       setUsersLoading(true);
-      listUtilisateurs({ role: roleFiltre || undefined, page: utilisateursPage })
+      listAdminUsers(session.token, {
+        role: roleFiltre || undefined,
+        actif: actifFiltre === "" ? undefined : actifFiltre === "true",
+        q: qUtilisateur.trim() || undefined,
+        page: utilisateursPage,
+      })
         .then((result) => {
           setUtilisateurs(result.resultats);
           setUtilisateursTotal(result.total);
         })
         .catch(() => setError("Impossible de charger les utilisateurs."))
         .finally(() => setUsersLoading(false));
-    }, 0);
+    }, 300);
 
     return () => clearTimeout(timeout);
-  }, [session, isAdmin, roleFiltre, utilisateursPage]);
+  }, [session, isAdmin, roleFiltre, actifFiltre, qUtilisateur, utilisateursPage]);
 
   useEffect(() => {
     if (!session || !isAdmin) return;
@@ -273,6 +291,46 @@ export default function AdminPage() {
       setError(err instanceof ApiError ? err.message : "Verification impossible.");
     } finally {
       setUserActionId(null);
+    }
+  }
+
+  async function handleReactiver(id: string) {
+    if (!session) return;
+    setUserActionId(id);
+    try {
+      await reactiverUtilisateur(session.token, id);
+      setUtilisateurs((prev) => prev.map((u) => (u.id === id ? { ...u, actif: true } : u)));
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Reactivation impossible.");
+    } finally {
+      setUserActionId(null);
+    }
+  }
+
+  function handleToggleEvaluations(id: string) {
+    if (!session) return;
+    if (evaluationsOuvertesPour === id) {
+      setEvaluationsOuvertesPour(null);
+      return;
+    }
+    setEvaluationsOuvertesPour(id);
+    setEvaluationsLoading(true);
+    listEvaluationsPourUtilisateur(id)
+      .then(setEvaluations)
+      .catch(() => setError("Impossible de charger les avis."))
+      .finally(() => setEvaluationsLoading(false));
+  }
+
+  async function handleDeleteEvaluation(id: string) {
+    if (!session) return;
+    setEvaluationActionId(id);
+    try {
+      await deleteEvaluationAdmin(session.token, id);
+      setEvaluations((prev) => prev.filter((e) => e.id !== id));
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Suppression impossible.");
+    } finally {
+      setEvaluationActionId(null);
     }
   }
 
@@ -598,18 +656,42 @@ export default function AdminPage() {
       <div className={`flex flex-col gap-4 ${activeTab === "utilisateurs" ? "" : "hidden"}`}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-sans text-xl font-semibold text-[#171c19]">Utilisateurs</h2>
-          <select
-            value={roleFiltre}
-            onChange={(e) => {
-              setRoleFiltre(e.target.value as "" | "PRODUCTEUR" | "ACHETEUR");
-              setUtilisateursPage(1);
-            }}
-            className="rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
-          >
-            <option value="">Tous les roles</option>
-            <option value="PRODUCTEUR">Producteurs</option>
-            <option value="ACHETEUR">Acheteurs</option>
-          </select>
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              type="text"
+              value={qUtilisateur}
+              onChange={(e) => {
+                setQUtilisateur(e.target.value);
+                setUtilisateursPage(1);
+              }}
+              placeholder="Nom ou telephone..."
+              className="rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+            />
+            <select
+              value={actifFiltre}
+              onChange={(e) => {
+                setActifFiltre(e.target.value as "" | "true" | "false");
+                setUtilisateursPage(1);
+              }}
+              className="rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+            >
+              <option value="">Tous les statuts</option>
+              <option value="true">Actifs</option>
+              <option value="false">Suspendus</option>
+            </select>
+            <select
+              value={roleFiltre}
+              onChange={(e) => {
+                setRoleFiltre(e.target.value as "" | "PRODUCTEUR" | "ACHETEUR");
+                setUtilisateursPage(1);
+              }}
+              className="rounded-lg border border-[#bfc9c1] px-4 py-2 font-[family-name:var(--font-work-sans)] text-sm text-[#171c19] outline-none focus:border-[#0f5238]"
+            >
+              <option value="">Tous les roles</option>
+              <option value="PRODUCTEUR">Producteurs</option>
+              <option value="ACHETEUR">Acheteurs</option>
+            </select>
+          </div>
         </div>
 
         {usersLoading ? (
@@ -620,46 +702,112 @@ export default function AdminPage() {
           </div>
         ) : utilisateurs.length === 0 ? (
           <p className="py-16 text-center font-[family-name:var(--font-work-sans)] text-base text-[#7c8a80]">
-            Aucun utilisateur actif ne correspond a ce filtre.
+            Aucun utilisateur ne correspond a ce filtre.
           </p>
         ) : (
           <div className="flex flex-col gap-3">
             {utilisateurs.map((utilisateur) => (
               <div
                 key={utilisateur.id}
-                className="flex flex-col gap-3 rounded-xl border border-[#dfe3e0] bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-3 rounded-xl border border-[#dfe3e0] bg-white p-4"
               >
-                <div className="flex flex-col gap-1">
-                  <p className="font-sans text-base font-semibold text-[#171c19]">
-                    {utilisateur.nom}
-                    {utilisateur.verifie ? " ✓" : ""}
-                  </p>
-                  <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
-                    {utilisateur.roles.join(", ")}
-                    {utilisateur.region ? ` · ${utilisateur.region}` : ""}
-                  </p>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex flex-col gap-1">
+                    <p className="font-sans text-base font-semibold text-[#171c19]">
+                      {utilisateur.nom}
+                      {utilisateur.verifie ? " ✓" : ""}
+                    </p>
+                    <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+                      {utilisateur.roles.join(", ")} · {utilisateur.telephone}
+                      {utilisateur.region ? ` · ${utilisateur.region}` : ""}
+                    </p>
+                    {!utilisateur.actif && (
+                      <span className="w-fit whitespace-nowrap rounded-full bg-[#fdecea] px-2 py-0.5 font-mono text-xs font-medium text-[#7a1f14]">
+                        Suspendu
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {utilisateur.roles.includes("PRODUCTEUR") && (
+                      <button
+                        type="button"
+                        onClick={() => handleToggleEvaluations(utilisateur.id)}
+                        className="whitespace-nowrap rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#404943] hover:bg-black/5"
+                      >
+                        {evaluationsOuvertesPour === utilisateur.id ? "Masquer les avis" : "Voir les avis"}
+                      </button>
+                    )}
+                    {!utilisateur.verifie && (
+                      <button
+                        type="button"
+                        disabled={userActionId === utilisateur.id}
+                        onClick={() => handleVerifier(utilisateur.id)}
+                        className="whitespace-nowrap rounded-lg bg-[#0f5238] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#0c4029] disabled:opacity-60"
+                      >
+                        Verifier
+                      </button>
+                    )}
+                    {utilisateur.actif ? (
+                      <button
+                        type="button"
+                        disabled={userActionId === utilisateur.id}
+                        onClick={() => handleSuspendre(utilisateur.id)}
+                        className="whitespace-nowrap rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#7a1f14] hover:bg-black/5 disabled:opacity-60"
+                      >
+                        Suspendre
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={userActionId === utilisateur.id}
+                        onClick={() => handleReactiver(utilisateur.id)}
+                        className="whitespace-nowrap rounded-lg bg-[#0f5238] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#0c4029] disabled:opacity-60"
+                      >
+                        Reactiver
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex gap-2">
-                  {!utilisateur.verifie && (
-                    <button
-                      type="button"
-                      disabled={userActionId === utilisateur.id}
-                      onClick={() => handleVerifier(utilisateur.id)}
-                      className="whitespace-nowrap rounded-lg bg-[#0f5238] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-white hover:bg-[#0c4029] disabled:opacity-60"
-                    >
-                      Verifier
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    disabled={userActionId === utilisateur.id}
-                    onClick={() => handleSuspendre(utilisateur.id)}
-                    className="whitespace-nowrap rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-sm font-medium text-[#7a1f14] hover:bg-black/5 disabled:opacity-60"
-                  >
-                    Suspendre
-                  </button>
-                </div>
+                {evaluationsOuvertesPour === utilisateur.id && (
+                  <div className="flex flex-col gap-2 border-t border-[#eef3ef] pt-3">
+                    {evaluationsLoading ? (
+                      <div className="h-10 animate-pulse rounded-lg bg-[#eef3ef]" />
+                    ) : evaluations.length === 0 ? (
+                      <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+                        Aucun avis recu.
+                      </p>
+                    ) : (
+                      evaluations.map((evaluation) => (
+                        <div
+                          key={evaluation.id}
+                          className="flex items-center justify-between gap-3 rounded-lg bg-[#f7f9f7] px-3 py-2"
+                        >
+                          <div className="flex flex-col gap-0.5">
+                            <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#171c19]">
+                              {"★".repeat(evaluation.note)}
+                              {"☆".repeat(5 - evaluation.note)} — {evaluation.auteur.nom}
+                            </p>
+                            {evaluation.commentaire && (
+                              <p className="font-[family-name:var(--font-work-sans)] text-sm text-[#7c8a80]">
+                                &laquo;{evaluation.commentaire}&raquo;
+                              </p>
+                            )}
+                          </div>
+                          <button
+                            type="button"
+                            disabled={evaluationActionId === evaluation.id}
+                            onClick={() => handleDeleteEvaluation(evaluation.id)}
+                            className="whitespace-nowrap rounded-lg border border-[#bfc9c1] px-3 py-1.5 font-[family-name:var(--font-work-sans)] text-xs font-medium text-[#7a1f14] hover:bg-black/5 disabled:opacity-60"
+                          >
+                            Supprimer
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
